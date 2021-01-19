@@ -42,4 +42,8 @@ class PagesController extends Controller
             ->withDatasheet($datasheet)
             ->withAbsencesToday($absences);
     }
+    public function test()
+    {
+        echo "Yahoo";
+    }
 }
