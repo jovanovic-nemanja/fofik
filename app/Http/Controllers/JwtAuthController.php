@@ -1,0 +1,164 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
+
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
+use App\Models\User;
+use Socialite;
+
+class JwtAuthController extends Controller
+{
+    //
+    public $token = true;
+
+    public function __construct()
+    {
+    }
+    /**
+     * login via google.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function googleProvider(Request $request)
+    {
+        $gToken = $request->get('access_token');
+        $lang = $request->get('language');
+        $deviceID = $request->get('device_id');
+        $platform = $request->get('platform');
+
+        try {
+            $googleAccount = Socialite::driver('google')->userFromToken($gToken);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success'=>false, 
+                'message' => 'You are an unauthroized user'
+            ], 401);
+        }
+
+        $user = User::where(['social_id' => $googleAccount->id, 'social_site' => 'google'])->first();
+
+        if (!$user) {
+            $user = new User;
+            $user->name = $googleAccount->getName();
+            $user->email = $googleAccount->getEmail();
+            $user->social_id = $googleAccount->getId();
+            $user->social_site = 'google';
+            $user->created_on = date('Y-m-d');
+            $user->save();
+        }
+        $user->lang = $lang;
+        $user->device_id = $deviceID;
+        $user->platform = $platform;
+        $user->update();
+
+        if (!$token = auth('api')->attempt(true)) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'You are an unauthorized user'
+            ]);
+        }
+        return $this->createNewToken($token);
+    }
+    /**
+     * login via google.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function facebookProvider(Request $request)
+    {
+        $fbToken = $request->get('access_token');
+        $lang = $request->get('language');
+        $deviceID = $request->get('device_id');
+        $platform = $request->get('platform');
+
+        try {
+            $facebookAccount = Socialite::driver('facebook')->userFromToken($fbToken);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success'=>false, 
+                'message' => 'You are an unauthroized user'
+            ], 401);
+        }
+
+        $user = User::where(['social_id' => $facebookAccount->id, 'social_site' => 'facebook'])->first();
+        if (!$user) {
+            $user = new User;
+            $user->name = $facebookAccount->getName();
+            $user->email = $facebookAccount->getEmail();
+            $user->social_id = $facebookAccount->getId();
+            $user->social_site = 'facebook';
+            $user->created_on = date('Y-m-d');
+            $user->save();
+        }
+        $user->lang = $lang;
+        $user->device_id = $deviceID;
+        $user->platform = $platform;
+        $user->update();
+
+        if (!$token = auth('api')->attempt(true)) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'You are an unauthorized user'
+            ]);
+        }
+        return $this->createNewToken($token);
+    }
+
+    /**
+     * logout user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+
+    public function logout(Request $request)
+    {
+        auth('api')->logout();
+        return response()->json([
+            'success'=>true, 
+            'message' => 'User successfully signed out', 
+            'token' => $request->header('Authorization')
+        ]);
+    }
+
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh(Request $request) {
+        $new_token = auth('api')->refresh();
+        return $this->createNewToken($new_token);
+    }
+
+    /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function createNewToken($token){
+        $user = auth('api')->user();
+        return response()->json([
+            'success' => true,
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 5,
+            'user' => $user
+        ]);
+    }
+
+    public function saveDeviceToken(Request $request) 
+    {
+        auth('api')->user()->update(['device_token' => $request->token]);
+        return response()->json('token saved successfully');
+    }
+}
