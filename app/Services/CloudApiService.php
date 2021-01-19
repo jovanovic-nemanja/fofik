@@ -33,8 +33,8 @@ class CloudApiService extends BaseService
         $ch = curl_init($url);
 
         //Getting image
-        $image = file_get_contents('https://pbs.twimg.com/profile_images/988775660163252226/XpgonN0X_400x400.jpg');
-
+        // $image = file_get_contents('https://pbs.twimg.com/profile_images/988775660163252226/XpgonN0X_400x400.jpg');
+        $image = file_get_contents(public_path('uploads/photos/Bill_Gates.jpg'));
         //converting image into base64
         $image_64= base64_encode($image);
 
@@ -74,20 +74,25 @@ class CloudApiService extends BaseService
 
         // Execute the POST request
         $result = curl_exec($ch);
-        
+        // Close cURL resource
+        curl_close($ch);
+
         $result = json_decode($result);
         if (count($result->responses) > 0) {
             $faces = $result->responses[0]->faceAnnotations;
             if (count($faces) > 0) {
-                $celebs = $faces[0]->recognitionResult;
-                foreach ($celebs as $itr) {
-                    $itr->displayName
+                if (!@$faces[0]['recognitionResult'])
+                    return null;
+                $celebs = $faces[0]['recognitionResult'];
+                $confidence = 0; $top = 0;
+                foreach ($celebs as $itr => $each) {
+                    if ($each['confidence'] > $confidence)
+                        $top = $itr;
                 }
+                return $celebs[$top]['celebrity']['displayName'];
             }
         }
-        print_r($result->responses[0]->faceAnnotations[0]->recognitionResult[0]);exit();
-        // Close cURL resource
-        curl_close($ch);
+        return null;
     }
     public function amazonCV($photo)
     {
@@ -111,6 +116,7 @@ class CloudApiService extends BaseService
     }
     public function wiki($params)
     {
+        $name = $params['name'];
         
     }
     public function serp($params)
