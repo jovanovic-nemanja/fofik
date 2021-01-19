@@ -81,15 +81,15 @@ class CloudApiService extends BaseService
         if (count($result->responses) > 0) {
             $faces = $result->responses[0]->faceAnnotations;
             if (count($faces) > 0) {
-                if (!@$faces[0]['recognitionResult'])
+                if (!@$faces[0]->recognitionResult)
                     return null;
-                $celebs = $faces[0]['recognitionResult'];
+                $celebs = $faces[0]->recognitionResult;
                 $confidence = 0; $top = 0;
                 foreach ($celebs as $itr => $each) {
-                    if ($each['confidence'] > $confidence)
+                    if ($each->confidence > $confidence)
                         $top = $itr;
                 }
-                return $celebs[$top]['celebrity']['displayName'];
+                return $celebs[$top]->celebrity->displayName;
             }
         }
         return null;
