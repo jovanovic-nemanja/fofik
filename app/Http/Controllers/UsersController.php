@@ -38,8 +38,7 @@ class UsersController extends Controller
 
     public function anyData()
     {
-        $canUpdateUser = auth()->user()->can('update-user');
-        $users = User::select(['id', 'external_id', 'name', 'email', 'social_id', 'social_site']);
+        $users = User::select(['id', 'external_id', 'name', 'email', 'device_id']);
         return Datatables::of($users)
             ->addColumn('namelink', function ($users) {
                 return '<a href="/users/' . $users->external_id . '" ">' . $users->name . '</a>';

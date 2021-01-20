@@ -9,8 +9,7 @@
         <tr>
             <th>{{ __('Name') }}</th>
             <th>{{ __('Mail') }}</th>
-            <th>{{ __('Social ID') }}</th>
-            <th>{{ __('Social Site') }}</th>
+            <th>{{ __('Device ID') }}</th>
             <th class="action-header"></th>
             <th class="action-header"></th>
 {{--            <th class="action-header"></th>--}}
@@ -129,8 +128,7 @@
 
                 {data: 'namelink', name: 'name'},
                 {data: 'email', name: 'email'},
-                {data: 'social_id', name: 'Social ID'},
-                {data: 'social_site', name: 'Social Site'},
+                {data: 'device_id', name: 'Device_ID'},
                 {
                     data: 'edit', name: 'edit', orderable: false, searchable: false, class:'fit-action-delete-th table-actions'
                 },
