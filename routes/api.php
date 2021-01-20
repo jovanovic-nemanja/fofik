@@ -46,5 +46,5 @@ Route::group([
     Route::get('/follow-list', [FavoriteController::class, 'show']);
     
     Route::post('/search', [CelebController::class, 'search']);
-    Route::get('/', [CelebController::class, '']);
+    Route::get('/hint', [CelebController::class, 'recommend']);
 });

@@ -65,6 +65,21 @@ class CelebController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function recommend(Request $request)
+    {
+        $params = $request->all();
+        if (!@$params['keyword']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Recommendation failed'
+            ]);
+        }
+        $recs = ["Tom Hanks", "Tom Benette", "Tomson Wall"];
+        return response()->json([
+            'success' => true,
+            'data' => $recs
+        ]);
+    }
     protected function store($params)
     {
         $this->cloudApiService->wiki($params);
