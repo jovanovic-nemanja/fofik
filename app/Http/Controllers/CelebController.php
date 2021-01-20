@@ -74,8 +74,8 @@ class CelebController extends Controller
         $this->cloudApiService->songkick($params);
         $this->cloudApiService->serp($params);
         
-        // $user = $this->userService->getByID(auth('api')->user()->id);
-        $user = $this->userService->getByID(1);
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        // $user = $this->userService->getByID(1);
         
         $celebrity = $this->celebService->getModel(['id' => 1]);
         $user->histories()->attach($celebrity, ['created_on' => Date('Y-m-d')]);

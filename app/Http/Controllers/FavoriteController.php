@@ -26,8 +26,8 @@ class FavoriteController extends Controller
      */
     public function store(Request $request)
     {
-        // $user = $this->userService->getByID(auth('api')->user()->id);
-        $user = $this->userService->getByID(1);
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        // $user = $this->userService->getByID(1);
         $celebrity = $this->celebService->getModel(['external_id' => $request->all('celeb_ext_id')]);
         $user->favorites()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
         return response()->json(['success' => true]);
@@ -39,8 +39,8 @@ class FavoriteController extends Controller
      */ 
     public function destroy(Request $request)
     { 
-        // $user = $this->userService->getByID(auth('api')->user()->id);
-        $user = $this->userService->getByID(1);
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        // $user = $this->userService->getByID(1);
         $celebrity = $this->celebService->getModel(['external_id' => $request->all('celeb_ext_id')]);
         $user->favorites()->detach($celebrity);
         return response()->json(['success' => true]);
@@ -51,8 +51,8 @@ class FavoriteController extends Controller
      */
     public function show(Request $request)
     {   
-        // $user = User::findOne(auth('api')->user()->id);
-        $user = $this->userService->getByID(1);
+        $user = User::findOne(auth('api')->user()->id);
+        // $user = $this->userService->getByID(1);
         $favorites = $user->favorites;
         $data = [];
         foreach ($favorites as $item) {
