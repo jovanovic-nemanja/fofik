@@ -29,6 +29,8 @@ Route::group([
 ], function ($router) {
     Route::get('/google', [JwtAuthController::class, 'googleProvider']);
     Route::get('/facebook', [JwtAuthController::class, 'facebookProvider']);
+    Route::post('/signin', [JwtAuthController::class, 'login']);
+    Route::post('/social', [JwtAuthController::class, 'socialProvider']);
     Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/logout', [JwtAuthController::class, 'logout']);
         Route::post('/refresh', [JwtAuthController::class, 'refresh']);

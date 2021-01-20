@@ -113,6 +113,88 @@ class JwtAuthController extends Controller
     }
 
     /**
+     * signin user
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function login(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'device_id'     => 'required',
+            'language'      => 'required',
+            'platform'      => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $params = $request->all();
+        $deviceID = $params['device_id'];
+        $lang     = $params['language'];
+        $platform = $params['platform'];
+
+        $user = User::where(['device_id' => $deviceID])->first();
+        if (!$user) {
+            $user = new User;
+            $user->device_id = $deviceID;
+            $user->save();
+        }
+        $user->lang = $lang;
+        $user->platform = $platform;
+        
+        if (!$token = auth('api')->attempt(['device_id' => $deviceID])) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Authorization failed'
+            ]);
+        }
+        $user->access_token = $token;
+        $user->update();
+
+        return $this->createNewToken($token);
+    }
+
+    /**
+     * load personal data via social signin
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function socialProvider(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'access_token'  => 'required',
+            'username'      => 'required',
+            'email'         => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $params = $request->all();
+        $token = $params['access_token'];
+        $name  = $params['username'];
+        $email = $params['email'];
+
+        $user = User::where(['access_token' => $token])->first();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'invalid request'
+            ]);
+        }
+
+        $user->name = $name;
+        $user->email = $email;
+        $user->update();
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
+    /**
      * logout user.
      *
      * @return \Illuminate\Http\JsonResponse

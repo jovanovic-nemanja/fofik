@@ -18,12 +18,13 @@ class CreateUsersTable extends Migration
             $table->string('external_id');
             $table->string('name');
             $table->string('email');
+            $table->string('password');
             $table->string('social_id');
             $table->string('social_site');
             $table->string('lang');
             $table->string('platform');
             $table->string('device_id');
-            $table->string('device_token');
+            $table->text('access_token');
             $table->rememberToken();
             $table->timestamps();
         });
