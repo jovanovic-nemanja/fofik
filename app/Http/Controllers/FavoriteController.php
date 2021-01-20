@@ -51,7 +51,7 @@ class FavoriteController extends Controller
      */
     public function show(Request $request)
     {   
-        $user = User::findOne(auth('api')->user()->id);
+        $user = $this->userService->getByID(auth('api')->user()->id);
         // $user = $this->userService->getByID(1);
         $favorites = $user->favorites;
         $data = [];
