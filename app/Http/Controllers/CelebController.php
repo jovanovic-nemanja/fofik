@@ -39,7 +39,7 @@ class CelebController extends Controller
     public function search(Request $request) 
     {
         $params = $request->all();
-        if (@$params['name'] && $name = $params['name']) {
+        if (@$params['name']) {
             return $this->store($params);
         }
         if ($photo = $request->file('photo')) {

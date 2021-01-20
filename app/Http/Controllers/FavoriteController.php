@@ -26,10 +26,19 @@ class FavoriteController extends Controller
      */
     public function store(Request $request)
     {
-        // $user = $this->userService->getByID(auth('api')->user()->id);
+        $params = $request->all();
+
+        if (!@$params['celeb_ext_id']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid request'
+            ]);
+        }
+
+        $user = $this->userService->getByID(auth('api')->user()->id);
         // $user = $this->userService->getByID(1);
-        // $celebrity = $this->celebService->getModel(['external_id' => $request->all('celeb_ext_id')]);
-        // $user->favorites()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
+        $celebrity = $this->celebService->getModel(['external_id' => $params('celeb_ext_id')]);
+        $user->favorites()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
         return response()->json(['success' => true]);
     }
     /**
@@ -39,9 +48,18 @@ class FavoriteController extends Controller
      */ 
     public function destroy(Request $request)
     { 
+        $params = $request->all();
+        
+        if (!@$params['celeb_ext_id']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid request'
+            ]);
+        }
+        
         $user = $this->userService->getByID(auth('api')->user()->id);
         // $user = $this->userService->getByID(1);
-        $celebrity = $this->celebService->getModel(['external_id' => $request->all('celeb_ext_id')]);
+        $celebrity = $this->celebService->getModel(['external_id' => $params('celeb_ext_id')]);
         $user->favorites()->detach($celebrity);
         return response()->json(['success' => true]);
     }
