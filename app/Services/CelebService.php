@@ -14,7 +14,7 @@ class CelebService extends BaseService
 
     public function getModel($params)
     {   
-        return Celebrity::where($params)->firstOrFail();
+        return Celebrity::where($params)->first();
     }
     public function getPersonalInfo($id)
     {

@@ -1287,3 +1287,19 @@ Stack trace:
 #8 D:\\Work\\Git\\fofik\\server.php(21): require_once('D:\\\\Work\\\\Git\\\\fof...')
 #9 {main}
 "} 
+[2021-01-20 17:55:11] local.ERROR: There are no commands defined in the "migrate:" namespace.
+
+Did you mean this?
+    migrate {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"migrate:\" namespace.
+
+Did you mean this?
+    migrate at D:\\Work\\Git\\fofik\\vendor\\symfony\\console\\Application.php:605)
+[stacktrace]
+#0 D:\\Work\\Git\\fofik\\vendor\\symfony\\console\\Application.php(656): Symfony\\Component\\Console\\Application->findNamespace('migrate:')
+#1 D:\\Work\\Git\\fofik\\vendor\\symfony\\console\\Application.php(254): Symfony\\Component\\Console\\Application->find('migrate::rollba...')
+#2 D:\\Work\\Git\\fofik\\vendor\\symfony\\console\\Application.php(166): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 D:\\Work\\Git\\fofik\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Application.php(93): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 D:\\Work\\Git\\fofik\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#5 D:\\Work\\Git\\fofik\\artisan(30): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#6 {main}
+"} 
