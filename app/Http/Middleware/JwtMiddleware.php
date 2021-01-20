@@ -31,7 +31,6 @@ class JwtMiddleware extends BaseMiddleware
                 // If the token is expired, then it will be refreshed and added to the headers
                 try
                 {
-                    
                   $refreshed = JWTAuth::refresh(JWTAuth::getToken());
                   $user = JWTAuth::setToken($refreshed)->toUser();
                   $request->headers->set('Authorization','Bearer '.$refreshed);
