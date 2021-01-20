@@ -39,7 +39,7 @@ Route::group([
 
 Route::group([
     'prefix' => 'celebs',
-    'middleware' => 'auth:api'
+    'middleware' => 'api'
 ], function ($router) {
     Route::post('/follow', [FavoriteController::class, 'store']);
     Route::post('/unfollow', [FavoriteController::class, 'destroy']);
