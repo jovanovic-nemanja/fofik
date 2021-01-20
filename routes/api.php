@@ -18,11 +18,11 @@ use App\Http\Controllers\JwtAuthController;
 |
 */
 
-Route::group(['namespace' => 'App\Api\v1\Controllers'], function () {
-    Route::group(['middleware' => 'auth:api'], function () {
-        Route::get('users', ['uses' => 'UserController@index']);
-    });
-});
+// Route::group(['namespace' => 'App\Api\v1\Controllers'], function () {
+//     Route::group(['middleware' => 'auth:api'], function () {
+//         Route::get('users', ['uses' => 'UserController@index']);
+//     });
+// });
 
 Route::group([
     'prefix' => 'auth'

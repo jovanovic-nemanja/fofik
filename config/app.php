@@ -137,7 +137,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         // App\Providers\ViewComposerServiceProvider::class,
         // App\Providers\DropboxServiceProvider::class,
-        'Tymon\JWTAuth\Providers\LaravelServiceProvider'
+        'Tymon\JWTAuth\Providers\LaravelServiceProvider',
 
     ],
 
@@ -189,6 +189,7 @@ return [
         'Datatables' => Yajra\Datatables\Datatables::class,
         'Carbon'     => Carbon\Carbon::class,
         'Notifty'    => Illuminate\Support\Facades\Notification::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class, 
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
     ],
-
 ];
