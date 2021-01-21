@@ -82,6 +82,7 @@ class CelebController extends Controller
     }
     protected function store($params)
     {
+        return response()->json(['success' => true]);
         $user = $this->userService->getByID(auth('api')->user()->id);
         $celebrity = $this->celebService->getModel(['fullname' => $params['name']]);
         if (!$celebrity) {
@@ -93,9 +94,9 @@ class CelebController extends Controller
             $this->cloudApiService->songkick($params);
             $this->cloudApiService->serp($params);
 
-            $celebrity = new Celebrity();
+            // $celebrity = new Celebrity();
             // 
-            $celebrity->save();
+            // $celebrity->save();
         }
 
         $user->histories()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
