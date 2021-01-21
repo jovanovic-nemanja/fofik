@@ -144,6 +144,8 @@ class JwtAuthController extends Controller
         $user->lang = $lang;
         $user->platform = $platform;
         
+        auth('api')->factory()->setTTL(1000);
+        
         if (!$token = auth('api')->attempt(['device_id' => $deviceID])) {
             return response()->json([
                 'success' => false, 

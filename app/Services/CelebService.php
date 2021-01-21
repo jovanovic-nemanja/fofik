@@ -18,7 +18,7 @@ class CelebService extends BaseService
     }
     public function getPersonalInfo($id)
     {
-        $celebrity = Celebrity::findOrFail($id);
+        $celebrity = Celebrity::find($id);
         
         $relatives = $celebrity->relatives;
         $tmpArr = [];

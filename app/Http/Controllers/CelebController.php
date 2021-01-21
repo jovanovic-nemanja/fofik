@@ -82,19 +82,24 @@ class CelebController extends Controller
     }
     protected function store($params)
     {
-        $this->cloudApiService->wiki($params);
-        $this->cloudApiService->youtube($params);
-        $this->cloudApiService->imdb($params);
-        $this->cloudApiService->gNews($params);
-        $this->cloudApiService->songkick($params);
-        $this->cloudApiService->serp($params);
-        
         $user = $this->userService->getByID(auth('api')->user()->id);
-        // $user = $this->userService->getByID(1);
-        
-        $celebrity = $this->celebService->getModel(['id' => 1]);
+        $celebrity = $this->celebService->getModel(['fullname' => $params['name']]);
+        if (!$celebrity) {
+
+            $this->cloudApiService->wiki($params);
+            $this->cloudApiService->youtube($params);
+            $this->cloudApiService->imdb($params);
+            $this->cloudApiService->gNews($params);
+            $this->cloudApiService->songkick($params);
+            $this->cloudApiService->serp($params);
+
+            $celebrity = new Celebrity();
+            // 
+            $celebrity->save();
+        }
+
         $user->histories()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
-        $data = $this->celebService->getPersonalInfo(3);
+        $data = $this->celebService->getPersonalInfo($celebrity->id);
         return response()->json(['success' => true, 'data' => $data]);
     }
 }

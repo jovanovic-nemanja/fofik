@@ -6,6 +6,7 @@ use Closure;
 use DB;
 
 use Google\Cloud\Core\ServiceBuilder;
+use Aws\Rekognition\RekognitionClient;
 
 class CloudApiService extends BaseService
 {
@@ -34,7 +35,7 @@ class CloudApiService extends BaseService
 
         //Getting image
         // $image = file_get_contents('https://pbs.twimg.com/profile_images/988775660163252226/XpgonN0X_400x400.jpg');
-        $image = file_get_contents(public_path('uploads/photos/Bill_Gates.jpg'));
+        $image = file_get_contents(public_path($photo));
         //converting image into base64
         $image_64= base64_encode($image);
 
@@ -78,25 +79,45 @@ class CloudApiService extends BaseService
         curl_close($ch);
 
         $result = json_decode($result);
-        if (count($result->responses) > 0) {
-            $faces = $result->responses[0]->faceAnnotations;
-            if (count($faces) > 0) {
-                if (!@$faces[0]->recognitionResult)
-                    return null;
-                $celebs = $faces[0]->recognitionResult;
-                $confidence = 0; $top = 0;
-                foreach ($celebs as $itr => $each) {
-                    if ($each->confidence > $confidence)
+        $faces = @$result->responses[0]->faceAnnotations;
+        if ($faces) {
+            $celeb = $faces[0];
+            $candidates = @$celeb->recognitionResult;
+            if ($candidates && count($candidates) > 0) {
+                $accuracy = 0; $top = 0;
+                foreach ($candidates as $itr => $each) {
+                    if ($each->confidence > $accuracy) {
+                        $accuracy = $each->confidence;
                         $top = $itr;
+                    }
                 }
-                return $celebs[$top]->celebrity->displayName;
+                return $candidates[$top]->celebrity->displayName;
             }
         }
         return null;
     }
     public function amazonCV($photo)
     {
-        
+        $client = new RekognitionClient([
+            'region'    => 'eu-central-1',
+            'version'   => 'latest'
+        ]);
+
+        $image = fopen(public_path($photo), 'r');
+        $bytes = fread($image, filesize(public_path($photo)));
+        $result = $client->recognizeCelebrities(['Image' => ['Bytes' => $bytes]]);
+        $celebs = $result["CelebrityFaces"];
+        if (count($celebs) > 0) {
+            $confidence = 0; $top = 0;
+            foreach ($celebs as $itr => $each) {
+                if ($each['MatchConfidence'] > $confidence) {
+                    $top = $itr;
+                    $confidence = $each['MatchConfidence'];
+                }
+            }
+            return $celebs[$top]['Name'];
+        }
+        return null;
     }
     public function youtube($params)
     {
