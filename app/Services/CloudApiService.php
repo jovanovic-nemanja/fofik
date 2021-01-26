@@ -157,7 +157,7 @@ class CloudApiService extends BaseService
 
         $movies = $res->castMovies;
         array_splice($movies, $start, $length);
-        
+
         foreach ($movies as $movie)
         {
             $url = 'http://www.omdbapi.com/?&plot=full&apikey=b9b1735c&i='.$movie->id;
@@ -185,7 +185,7 @@ class CloudApiService extends BaseService
     {
         
     }
-    public function wiki($params)
+    public function wikiBase($params)
     {
         $name = $params['name'];
         $lang = $params['lang'];
@@ -306,20 +306,40 @@ class CloudApiService extends BaseService
         {
             if (!@$data[$entities[$entId]])
                 $data[$entities[$entId]] = '';
-            $data[$entities[$entId]] .= ($entVal->labels->{$lang}->value. ' ');
+            $data[$entities[$entId]] .= ($entVal->labels->{$lang}->value. '&');
         }
-        // $url = 'https://www.wikipedia.org/w/api.php?';
-        // $payload = array (
-        //     'action' => 'parse',
-        //     'format' => 'json',
-        //     'prop' => 'text|wikitext',
-        //     'page' => 'Tom%20Hanks'
-        // );
-        // $data = $this->api($url, $payload);
-        // $wikiText = ((array)$data->parse->wikitext)['*'];
-        // $text = ((array)$data->parse->text)['*'];
-        // print_r($text);
+        
         return $data;
+    }
+    public function wikiSection($params)
+    {
+        $name = $params['name'];
+        $section = $params['section'];
+        $lang = $params['lang'];
+
+        $url = 'https://'.$lang.'.wikipedia.org/w/api.php?';
+        $payload = array (
+            'action' => 'parse',
+            'format' => 'json',
+            'prop' => 'sections',
+            'page' => str_replace(' ', '%20', $name)
+        );
+        $data = $this->api($url, $payload);
+        $wikiblock = null;
+        foreach ($data->parse->sections as $each)
+        {
+            if ($each->line == $section)
+            {
+                $payload['prop'] = 'text';
+                $payload['section'] = $each->index;
+                $wikiblock = $this->api($url, $payload);
+                break;
+            }
+        }
+        $text = $wikiblock->parse->text->{'*'};
+        $text = str_replace('\n', '', $text);
+        $text = str_replace('\"', '"', $text);
+        return $text;
     }
     public function bing($params)
     {

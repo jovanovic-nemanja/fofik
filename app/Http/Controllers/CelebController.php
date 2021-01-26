@@ -149,13 +149,25 @@ class CelebController extends Controller
         ]);
     }
 
+    public function section(Request $request)
+    {
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        $params = $request->all();
+        $params['lang'] = $user->lang;
+        $data = $this->cloudApiService->wikiSection($params);
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+
     protected function store($params)
     {
         $user = $this->userService->getByID(auth('api')->user()->id);
         $params['lang'] = $lang = $user->lang;
         $detail = $this->celebService->getDetailModel($params);
         if (!$detail) {
-            $wiki = $this->cloudApiService->wiki($params);
+            $wiki = $this->cloudApiService->wikiBase($params);
             $celebrity = $this->celebService->getModel(['external_id' => $wiki['external_id']]);
             if (!$celebrity) {
                 $celebrity = new Celebrity();
