@@ -31,6 +31,7 @@ class CelebController extends Controller
         $this->cloudApiService = $cloudApiService;
         $this->openCVService = $openCVService;
     }
+    
     /**
      * Search all celebrities who have name similar with keyword
      * @param string keyword
@@ -56,6 +57,7 @@ class CelebController extends Controller
             'data' => $data
         ]);
     }
+
     /**
      * Search celebrity
      * @param string name
@@ -83,6 +85,7 @@ class CelebController extends Controller
             'data' => $data
         ]);
     }
+
     /**
      * Search all movies related with celebrity
      * @param string name
@@ -104,6 +107,7 @@ class CelebController extends Controller
             'data' => $imdb
         ]);
     }
+
     /**
      * Search all videos related with celebrity
      * @param string name
@@ -126,6 +130,7 @@ class CelebController extends Controller
             'data' => $youtube
         ]);
     }
+
     /**
      * Search all news related with celebrity
      * @param string name
@@ -209,6 +214,7 @@ class CelebController extends Controller
         $data['news'] = $this->cloudApiService->bing($params);
         return $data;
     }
+
     protected function vision($params)
     {
         if (@$params['name']) {

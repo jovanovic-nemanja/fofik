@@ -209,6 +209,7 @@ class CloudApiService extends BaseService
         
         if (!@$wikidata->labels) 
             return null;
+        
         $data['external_id'] = $wikidata->title;
         $data['en_name'] = $wikidata->labels->{'en'}->value;
         $data['natl_name'] = $wikidata->labels->{$lang}->value;
@@ -237,10 +238,10 @@ class CloudApiService extends BaseService
             }
         }
         if (@$wikidata->claims->{$p_birthdate}) {
-            $data['birth_date'] = $wikidata->claims->{$p_birthdate}[0]->mainsnak->datavalue->value->time;
+            $data['birth_date'] = Date($wikidata->claims->{$p_birthdate}[0]->mainsnak->datavalue->value->time);
         }
         if (@$wikidata->claims->{$p_deathdate}) {
-            $data['death_date'] = $wikidata->claims->{$p_deathdate}[0]->mainsnak->datavalue->value->time;
+            $data['death_date'] = Date($wikidata->claims->{$p_deathdate}[0]->mainsnak->datavalue->value->time);
         }
         if (@$wikidata->claims->{$p_birthplace}) {
             $q_birthplace = $wikidata->claims->{$p_birthplace}[0]->mainsnak->datavalue->value->id;
@@ -308,9 +309,8 @@ class CloudApiService extends BaseService
         {
             if (!@$data[$entities[$entId]])
                 $data[$entities[$entId]] = '';
-            $data[$entities[$entId]] .= ($entVal->labels->{$lang}->value. '&');
+            $data[$entities[$entId]] .= ($entVal->labels->{$lang}->value. ' ');
         }
-        
         return $data;
     }
     public function wikiSection($params)
