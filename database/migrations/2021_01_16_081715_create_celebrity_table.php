@@ -16,26 +16,14 @@ class CreateCelebrityTable extends Migration
         Schema::create('ff_celebs', function (Blueprint $table) {
             $table->id();
             $table->string('external_id');
-            $table->string('fullname');
-            $table->string('photo_url');
-            $table->dateTime('birth_date');
-            $table->dateTime('death_date');
-            $table->string('born_in');
-            $table->string('citizen_ship');
-            $table->text('education');
-            $table->string('occupation');
-            $table->string('net_worth');
-            $table->text('award');
-            $table->text('early_life');
-            $table->text('career');
-            $table->text('filmography');
-            $table->text('personal_life');
-            $table->text('activities');
-            $table->dateTime('active_start_date');
-            $table->dateTime('active_end_date');
-            $table->string('facebook');
-            $table->string('instagram');
-            $table->string('twitter');
+            $table->string('photo_url')->nullable();
+            $table->dateTime('birth_date')->nullable();
+            $table->dateTime('death_date')->nullable();
+            $table->dateTime('active_start_date')->nullable();
+            $table->dateTime('active_end_date')->nullable();
+            $table->string('facebook')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('twitter')->nullable();
             $table->timestamps();
         });
     }

@@ -4,17 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-use App\Traits\HasRelationTrait;
-class Celebrity extends Model
+class CelebDetail extends Model
 {
-
-    use HasRelationTrait;
+    //
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'ff_celebs';
+    protected $table = 'ff_celeb_detail';
 
     /**
      * The attributes that are mass assignable.
@@ -22,15 +20,22 @@ class Celebrity extends Model
      * @var array
      */
     protected $fillable = [
-        'external_id',
-        'photo_url',
-        'birth_date',
-        'death_date',
-        'active_start_date',
-        'active_end_date',
-        'facebook',
-        'instagram',
-        'twitter'
+        'celeb_id',
+        'en_name',
+        'natl_name',
+        'born_in',
+        'citizen_ship',
+        'spouse',
+        'children',
+        'education',
+        'occupation',
+        'net_worth',
+        'award',
+        'early_life',
+        'filmography',
+        'personal_life',
+        'activites',
+        'lang'
     ];
 
     /**

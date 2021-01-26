@@ -19,6 +19,7 @@
     "require": {
         "php": ">=7.3.5",
         "aws/aws-sdk-php": "^3.171",
+        "divineomega/php-wikitext-parser": "^1.0",
         "elasticsearch/elasticsearch": "^6.1",
         "google/apiclient": "^2.2",
         "google/cloud-vision": "^1.2",

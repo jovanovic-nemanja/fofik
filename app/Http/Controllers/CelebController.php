@@ -11,6 +11,7 @@ use App\Services\CloudApiService;
 use App\Services\OpenCVService;
 
 use App\Models\Celebrity;
+use App\Models\CelebDetail;
 use App\Models\Favorite;
 
 class CelebController extends Controller
@@ -31,6 +32,31 @@ class CelebController extends Controller
         $this->openCVService = $openCVService;
     }
     /**
+     * Search all celebrities who have name similar with keyword
+     * @param string keyword
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function recommend(Request $request)
+    {
+        $params = $request->all();
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        $lang = $user->lang;
+
+        $keyword = @$params['keyword'];
+        if (!$keyword) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Recommendation failed'
+            ]);
+        }
+        $data = $this->celebService->getRecommendations($keyword, $lang);
+        // $data = ["Tom Hanks", "Tom Benette", "Tomson Wall"];
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+    /**
      * Search celebrity
      * @param string name
      * @param file photo
@@ -39,68 +65,152 @@ class CelebController extends Controller
     public function search(Request $request) 
     {
         $params = $request->all();
-        if (@$params['name']) {
-            return $this->store($params);
-        }
         if ($photo = $request->file('photo')) {
             $photo = $this->photoUploadService->uploadPhoto($photo);
+            $params['photo'] = $photo;
+        }
+        $name = $this->vision($params);
+        if (!$name) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Can not find celebrity'
+            ]);
+        }
+        $params['name'] = $name;
+        $data = $this->store($params);
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+    /**
+     * Search all movies related with celebrity
+     * @param string name
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function movie(Request $request)
+    {
+        $params = $request->all();
+        $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
+        if (!$celebrity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Can not find celebrity'
+            ]);
+        }
+        $imdb = $this->cloudApiService->imdb($params);
+        return response()->json([
+            'success' => true,
+            'data' => $imdb
+        ]);
+    }
+    /**
+     * Search all videos related with celebrity
+     * @param string name
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function video(Request $request)
+    {
+        $params = $request->all();
+        $name = $params['name'];
+        $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
+        if (!$celebrity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Can not find celebrity'
+            ]);
+        }
+        $youtube = $this->cloudApiService->youtube($params);
+        return response()->json([
+            'success' => true,
+            'data' => $youtube
+        ]);
+    }
+    /**
+     * Search all news related with celebrity
+     * @param string name
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function news(Request $request)
+    {
+        $params = $request->all();
+        $name = $params['name'];
+        $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
+        if (!$celebrity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Can not find celebrity'
+            ]);
+        }
+        $news = $this->cloudApiService->bing($params);
+        return response()->json([
+            'success' => true,
+            'data' => $news
+        ]);
+    }
+
+    protected function store($params)
+    {
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        $params['lang'] = $lang = $user->lang;
+        $detail = $this->celebService->getDetailModel($params);
+        if (!$detail) {
+            $wiki = $this->cloudApiService->wiki($params);
+            $celebrity = $this->celebService->getModel(['external_id' => $wiki['external_id']]);
+            if (!$celebrity) {
+                $celebrity = new Celebrity();
+                $celebrity->external_id = @$wiki['external_id'];
+                $celebrity->photo_url = @$wiki['photo_url'];
+                $celebrity->birth_date = @$wiki['birth_date'];
+                $celebrity->death_date = @$wiki['death_date'];
+                $celebrity->facebook = @$wiki['facebook'];
+                $celebrity->instagram = @$wiki['instagram'];
+                $celebrity->twitter = @$wiki['twitter'];
+                $celebrity->save();
+            }
+
+            $detail = new CelebDetail();
+            $detail->celeb_id = $celebrity->id;
+            $detail->en_name = @$wiki['en_name'];
+            $detail->natl_name = @$wiki['natl_name'];
+            $detail->born_in = @$wiki['born_in'];
+            $detail->citizen_ship = @$wiki['citizen_ship'];
+            $detail->spouse = @$wiki['spouse'];
+            $detail->children = @$wiki['child'];
+            $detail->education = @$wiki['education'];
+            $detail->occupation = @$wiki['occupation'];
+            $detail->net_worth = @$wiki['net_worth'];   
+            $detail->lang = $params['lang'];
+            $detail->save();
+        } else {
+            $celebrity = $this->celebService->getModel(['id' => $detail->celeb_id]);
+        }
+
+        $user->histories()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
+
+        $data = [];
+        $data['about'] = $this->celebService->getDetailInfo($celebrity->id, $lang);
+        $data['video'] = $this->cloudApiService->youtube($params);
+        $data['movie'] = $this->cloudApiService->imdb($params);
+        $data['news'] = $this->cloudApiService->bing($params);
+        return $data;
+    }
+    protected function vision($params)
+    {
+        if (@$params['name']) {
+            return $params['name'];
+        }
+        if ($photo = @$params['photo']) {
             $name = $this->openCVService->recognize($photo);
             if (!$name) {
                 $name = $this->cloudApiService->googleCV($photo);
                 if (!$name) {
                     $name = $this->cloudApiService->amazonCV($photo);
-                    if (!$name) {
-                        return response()->json([
-                            'success' => false, 
-                            'message' => 'Matched data does not exist'
-                        ]);
-                    }
+                    if (!$name)
+                        return null;
                 }
             }
-            ///
-            $params['name'] = $name;
-            ///
-            return $this->store($params);
-        } 
-        return response()->json(['success' => true]);
-    }
-
-    public function recommend(Request $request)
-    {
-        $params = $request->all();
-        if (!@$params['keyword']) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Recommendation failed'
-            ]);
+            return $name;
         }
-        $recs = ["Tom Hanks", "Tom Benette", "Tomson Wall"];
-        return response()->json([
-            'success' => true,
-            'data' => $recs
-        ]);
-    }
-    protected function store($params)
-    {
-        return response()->json(['success' => true]);
-        $user = $this->userService->getByID(auth('api')->user()->id);
-        $celebrity = $this->celebService->getModel(['fullname' => $params['name']]);
-        if (!$celebrity) {
-
-            $this->cloudApiService->wiki($params);
-            $this->cloudApiService->youtube($params);
-            $this->cloudApiService->imdb($params);
-            $this->cloudApiService->gNews($params);
-            $this->cloudApiService->songkick($params);
-            $this->cloudApiService->serp($params);
-
-            // $celebrity = new Celebrity();
-            // 
-            // $celebrity->save();
-        }
-
-        $user->histories()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
-        $data = $this->celebService->getPersonalInfo($celebrity->id);
-        return response()->json(['success' => true, 'data' => $data]);
     }
 }

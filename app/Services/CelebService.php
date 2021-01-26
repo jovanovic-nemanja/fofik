@@ -5,6 +5,7 @@ namespace App\Services;
 use Closure;
 use DB;
 use App\Models\Celebrity;
+use App\Models\CelebDetail;
 
 class CelebService extends BaseService
 {
@@ -16,20 +17,29 @@ class CelebService extends BaseService
     {   
         return Celebrity::where($params)->first();
     }
-    public function getPersonalInfo($id)
-    {
-        $celebrity = Celebrity::find($id);
-        
-        $relatives = $celebrity->relatives;
-        $tmpArr = [];
-        foreach ($relatives as $item) {
-            $relType = $item->pivot->rel_type;
-            if (!@$tmpArr[$relType])
-                $tmpArr[$relType] = [];
-            $tmpArr[$relType][] = $item->name;
-        }
-        $celebrity->relatives = $tmpArr;
 
-        return $celebrity;
+    public function getDetailModel($params)
+    {
+        return CelebDetail::where('en_name', $params['name'])
+                          ->orWhere('natl_name', $params['name'])
+                          ->where('lang', $params['lang'])
+                          ->first();      
+    }
+
+    public function getDetailInfo($id, $lang)
+    {
+        return DB::table('ff_celebs as A')
+            ->join('ff_celeb_detail as B', 'A.id', '=', 'B.celeb_id')
+            ->select('A.*', 'B.*')
+            ->where('B.lang', '=', $lang)
+            ->where('B.celeb_id', '=', $id)
+            ->first();
+    }
+    public function getRecommendations($keyword, $lang)
+    {
+        return CelebDetail::select('fullname')->where([
+            ['fullname', 'LIKE', '%'.$keyword.'%'],
+            ['lang', '=', $lang]
+        ])->get();
     }
 }
