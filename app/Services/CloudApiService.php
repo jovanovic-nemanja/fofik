@@ -151,7 +151,14 @@ class CloudApiService extends BaseService
         $nmId = $res->results[0]->id;
         $url = 'https://imdb-api.com/en/API/Name/'.$apikey.'/'.$nmId;
         $res = $this->api($url, []);
-        foreach ($res->castMovies as $movie)
+
+        $start = 0;
+        $length = 10;
+
+        $movies = $res->castMovies;
+        array_splice($movies, $start, $length);
+        
+        foreach ($movies as $movie)
         {
             $url = 'http://www.omdbapi.com/?&plot=full&apikey=b9b1735c&i='.$movie->id;
             $detail = $this->api($url, []);

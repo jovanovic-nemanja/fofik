@@ -179,7 +179,7 @@ class CelebController extends Controller
             $detail->children = @$wiki['child'];
             $detail->education = @$wiki['education'];
             $detail->occupation = @$wiki['occupation'];
-            $detail->net_worth = @$wiki['net_worth'];   
+            $detail->net_worth = @$wiki['net_worth'];
             $detail->lang = $params['lang'];
             $detail->save();
         } else {
