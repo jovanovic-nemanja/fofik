@@ -206,7 +206,9 @@ class CloudApiService extends BaseService
 
         $data = [];
         $entities = [];
-
+        
+        if (!@$wikidata->labels) 
+            return null;
         $data['external_id'] = $wikidata->title;
         $data['en_name'] = $wikidata->labels->{'en'}->value;
         $data['natl_name'] = $wikidata->labels->{$lang}->value;

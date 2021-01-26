@@ -168,6 +168,8 @@ class CelebController extends Controller
         $detail = $this->celebService->getDetailModel($params);
         if (!$detail) {
             $wiki = $this->cloudApiService->wikiBase($params);
+            if (!$wiki)
+                return [];
             $celebrity = $this->celebService->getModel(['external_id' => $wiki['external_id']]);
             if (!$celebrity) {
                 $celebrity = new Celebrity();
