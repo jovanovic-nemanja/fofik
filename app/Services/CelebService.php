@@ -30,7 +30,7 @@ class CelebService extends BaseService
     {
         return DB::table('ff_celebs as A')
             ->join('ff_celeb_detail as B', 'A.id', '=', 'B.celeb_id')
-            ->select('A.*', 'B.*')
+            ->select('A.*', 'B.en_name, B.natl_name, B.born_in, B.citizen_ship, B.spouse, B.children, B.education, B.occupation, B.net_worth, B.lang')
             ->where('B.lang', '=', $lang)
             ->where('B.celeb_id', '=', $id)
             ->first();
