@@ -80,6 +80,12 @@ class CelebController extends Controller
         }
         $params['name'] = $name;
         $data = $this->store($params);
+        if (!$data) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Can not find celebrity'
+            ]);
+        }
         return response()->json([
             'success' => true,
             'data' => $data
@@ -174,7 +180,7 @@ class CelebController extends Controller
         if (!$detail) {
             $wiki = $this->cloudApiService->wikiBase($params);
             if (!$wiki)
-                return [];
+                return null;
             $celebrity = $this->celebService->getModel(['external_id' => $wiki['external_id']]);
             if (!$celebrity) {
                 $celebrity = new Celebrity();

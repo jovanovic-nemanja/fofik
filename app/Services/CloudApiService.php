@@ -196,10 +196,9 @@ class CloudApiService extends BaseService
             'languages' => $lang.'|en',
             'format' => 'json',
             'titles' => str_replace(' ', '%20', $name),
-            'sites' => 'enwiki',
+            'sites' => 'enwiki|trwiki',
         );
         $res = $this->api($url,$payload);
-        print_r($res); exit();
         $wikidata = null;
         foreach ($res->entities as $item) {
             $wikidata = $item;
@@ -315,7 +314,6 @@ class CloudApiService extends BaseService
                 $data[$entities[$entId]] = '';
             $data[$entities[$entId]] .= ($entVal->labels->{$lang}->value. ' ');
         }
-        print_r($data); exit();
         return $data;
     }
     public function wikiSection($params)
