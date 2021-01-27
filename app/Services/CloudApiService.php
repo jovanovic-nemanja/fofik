@@ -199,6 +199,7 @@ class CloudApiService extends BaseService
             'sites' => 'enwiki',
         );
         $res = $this->api($url,$payload);
+        print_r($res); exit();
         $wikidata = null;
         foreach ($res->entities as $item) {
             $wikidata = $item;
