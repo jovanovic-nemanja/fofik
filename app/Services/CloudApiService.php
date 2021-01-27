@@ -215,7 +215,7 @@ class CloudApiService extends BaseService
         $data['natl_name'] = $wikidata->labels->{$lang}->value;
         $data['description'] = $wikidata->descriptions->{$lang}->value;
 
-        $p_isni = 'P213';
+        $p_image = 'P18';
         $p_citizenship = 'P27';
         $p_birthdate = 'P569';
         $p_deathdate = 'P570';
@@ -231,6 +231,12 @@ class CloudApiService extends BaseService
         $p_instagram = 'P2003';
         $p_twitter = 'P2002';
 
+
+        if (@$wikidata->claims->{$p_image}) {
+            $imgExt = $wikidata->claims->{$p_image}[0]->mainsnak->datavalue->value;
+            $hash = md5($imgExt);
+            $data['photo_url'] = 'https://upload.wikimedia.org/wikipedia/commons/'.$hash[0].'/'.$hash[0].$hash[1].'/'.$imgExt;
+        }
         if (@$wikidata->claims->{$p_citizenship}) {
             foreach ($wikidata->claims->{$p_citizenship} as $item) {
                 $q_citizenship = $item->mainsnak->datavalue->value->id;
@@ -265,7 +271,6 @@ class CloudApiService extends BaseService
                 $entities[$q_child] = 'child';
             }
         }
-
         if (@$wikidata->claims->{$p_occupation}) {
             foreach ($wikidata->claims->{$p_occupation} as $occupation)
             {
@@ -273,7 +278,6 @@ class CloudApiService extends BaseService
                 $entities[$q_occupation] = 'occupation';
             }
         }
-        
         if (@$wikidata->claims->{$p_educated_at}) {
             foreach ($wikidata->claims->{$p_educated_at} as $college)
             {
@@ -294,7 +298,6 @@ class CloudApiService extends BaseService
         if (@$wikidata->claims->{$p_twitter}) {
             $data['twitter'] = $wikidata->claims->{$p_twitter}[0]->mainsnak->datavalue->value;
         }
-
         unset($payload['titles']);
         $entIds = [];
         foreach ($entities as $key => $value) 
