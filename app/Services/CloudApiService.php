@@ -314,6 +314,7 @@ class CloudApiService extends BaseService
                 $data[$entities[$entId]] = '';
             $data[$entities[$entId]] .= ($entVal->labels->{$lang}->value. ' ');
         }
+        print_r($data); exit();
         return $data;
     }
     public function wikiSection($params)
