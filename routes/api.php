@@ -51,7 +51,7 @@ Route::group([
     Route::post('/movie', [CelebController::class, 'movie']);
     Route::post('/news', [CelebController::class, 'news']);
 
-    Route::post('/section', [CelebController::class, 'section']);
+    Route::post('/descr', [CelebController::class, 'description']);
 
     Route::get('/hint', [CelebController::class, 'recommend']);
 });

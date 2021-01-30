@@ -141,7 +141,7 @@ class CloudApiService extends BaseService
     public function imdb($params)
     {
         $name = $params['name'];
-        $lang = $params['lang'];
+        // $lang = $params['lang'];
         $lang = 'en';
         $apikey = 'k_eljtb34t';
         $url = 'https://imdb-api.com/'.$lang.'/API/SearchName/'.$apikey.'/'.str_replace(' ', '%20', $name);
@@ -156,7 +156,7 @@ class CloudApiService extends BaseService
         $length = 10;
 
         $movies = $res->castMovies;
-        array_splice($movies, $start, $length);
+        $movies = array_splice($movies, $start, $length);
 
         foreach ($movies as $movie)
         {
@@ -177,18 +177,11 @@ class CloudApiService extends BaseService
         }
         return $data;
     }
-    public function gNews($params)
-    {
-        
-    }
-    public function songkick($params)
-    {
-        
-    }
     public function wikiBase($params)
-    {
+    {        
         $name = $params['name'];
         $lang = $params['lang'];
+
         // $lang = 'en';
         $url = 'https://www.wikidata.org/w/api.php?';
         $payload = array (
@@ -240,9 +233,9 @@ class CloudApiService extends BaseService
             $data['photo_url'] = 'https://upload.wikimedia.org/wikipedia/commons/'.$hash[0].'/'.$hash[0].$hash[1].'/'.$imgExt;
         }
         if (@$wikidata->claims->{$p_citizenship}) {
-            foreach ($wikidata->claims->{$p_citizenship} as $item) {
+            foreach ($wikidata->claims->{$p_citizenship} as $key => $item) {
                 $q_citizenship = $item->mainsnak->datavalue->value->id;
-                $entities[$q_citizenship] = 'citizen_ship';
+                $entities[$q_citizenship] = array('field' => 'citizen_ship', 'mul' => true, 'key' => $key);
             }
         }
         if (@$wikidata->claims->{$p_birthdate}) {
@@ -253,38 +246,39 @@ class CloudApiService extends BaseService
         }
         if (@$wikidata->claims->{$p_birthplace}) {
             $q_birthplace = $wikidata->claims->{$p_birthplace}[0]->mainsnak->datavalue->value->id;
-            $entities[$q_birthplace] = 'born_in';
+            $entities[$q_birthplace] = array('field' => 'born_in', 'mul' => false);
         }
         if (@$wikidata->claims->{$p_spouse}) {
-            foreach ($wikidata->claims->{$p_spouse} as $spouse)
+            foreach ($wikidata->claims->{$p_spouse} as $key => $spouse)
             {
                 $q_spouse = $spouse->mainsnak->datavalue->value->id;
-                $entities[$q_spouse] = 'spouse';
+                $start_time = null; $end_time = null;
                 if (@$spouse->qualifiers->{$p_starttime})
-                    $spouse->qualifiers->{$p_starttime}[0]->datavalue->value->time;
+                    $start_time = $spouse->qualifiers->{$p_starttime}[0]->datavalue->value->time;
                 if (@$spouse->qualifiers->{$p_endtime})
-                    $spouse->qualifiers->{$p_endtime}[0]->datavalue->value->time;
+                    $end_time = $spouse->qualifiers->{$p_endtime}[0]->datavalue->value->time;
+                $entities[$q_spouse] = array('field' => 'spouse', 'mul' => true, 'key' => $key, 'meta' => [@$start_time, @$end_time]);
             }
         }
         if (@$wikidata->claims->{$p_child}) {
-            foreach ($wikidata->claims->{$p_child} as $child)
+            foreach ($wikidata->claims->{$p_child} as $key => $child)
             {
                 $q_child = $child->mainsnak->datavalue->value->id;
-                $entities[$q_child] = 'child';
+                $entities[$q_child] = array('field' => 'child', 'mul' => true, 'key' => $key);
             }
         }
         if (@$wikidata->claims->{$p_occupation}) {
-            foreach ($wikidata->claims->{$p_occupation} as $occupation)
+            foreach ($wikidata->claims->{$p_occupation} as $key => $occupation)
             {
                 $q_occupation = $occupation->mainsnak->datavalue->value->id;
-                $entities[$q_occupation] = 'occupation';
+                $entities[$q_occupation] = array('field' => 'occupation', 'mul' => true, 'key' => $key);
             }
         }
         if (@$wikidata->claims->{$p_educated_at}) {
-            foreach ($wikidata->claims->{$p_educated_at} as $college)
+            foreach ($wikidata->claims->{$p_educated_at} as $key => $college)
             {
                 $q_educated_at = $college->mainsnak->datavalue->value->id;
-                $entities[$q_educated_at] = 'education';
+                $entities[$q_educated_at] = array('field' => 'education', 'mul' => true, 'key' => $key);
             }
         }   
 
@@ -312,40 +306,67 @@ class CloudApiService extends BaseService
 
         foreach ($res->entities as $entId => $entVal)
         {
-            if (!@$data[$entities[$entId]])
-                $data[$entities[$entId]] = '';
-            $data[$entities[$entId]] .= ($entVal->labels->{$lang}->value. ' ');
+            $value = $entVal->labels->{$lang}->value;
+            $field = $entities[$entId]['field'];
+            $is_arr = $entities[$entId]['mul'];
+            $meta = @$entities[$entId]['meta'] ? $entities[$entId]['meta'] : null;
+            if (!$is_arr) {
+                $data[$field] = $value;
+            } else {
+                if (!@$data[$field]) 
+                    $data[$field] = [];
+                if ($meta)
+                    $data[$field][] = array_merge(array($value), $meta);
+                else
+                    $data[$field][] = $value;
+            }
+        }
+
+        $url = 'https://www.wikipedia.org/w/api.php?';
+        $payload = array (
+            'action' => 'parse',
+            'format' => 'json',
+            'page' => str_replace(' ', '%20', $name),
+            'prop' => 'sections'
+        );
+        $res = $this->api($url, $payload);
+        $sections = $res->parse->sections;
+        
+        $data['description'] = []; 
+        foreach ($sections as $section) {
+            if ($section->toclevel == 1) {
+                $data['description'][] = array (
+                    'section_id' => $section->index,
+                    'section_title' => $section->line
+                );
+            }
         }
         return $data;
     }
     public function wikiSection($params)
     {
         $name = $params['name'];
-        $section = $params['section'];
+        $section_id = $params['section_id'];
         $lang = $params['lang'];
 
         $url = 'https://'.$lang.'.wikipedia.org/w/api.php?';
         $payload = array (
             'action' => 'parse',
             'format' => 'json',
-            'prop' => 'sections',
+            'prop' => 'text',
+            'mobileformat' => 1,
+            'disabletoc' => 1,
+            'section' => $section_id,
             'page' => str_replace(' ', '%20', $name)
         );
         $data = $this->api($url, $payload);
-        $wikiblock = null;
-        foreach ($data->parse->sections as $each)
-        {
-            if ($each->line == $section)
-            {
-                $payload['prop'] = 'text';
-                $payload['section'] = $each->index;
-                $wikiblock = $this->api($url, $payload);
-                break;
-            }
+        try {
+            $text = $data->parse->text->{'*'};
+            $text = preg_replace("/\r|\n/", "", $text);
+            $text = preg_replace("/\"/", "", $text);
+        } catch(Exception $e) {
+            return null;
         }
-        $text = $wikiblock->parse->text->{'*'};
-        $text = str_replace('\n', '', $text);
-        $text = str_replace('\"', '"', $text);
         return $text;
     }
     public function bing($params)
@@ -376,7 +397,14 @@ class CloudApiService extends BaseService
         }
         return $data;
     }
-
+    public function gNews($params)
+    {
+        
+    }
+    public function songkick($params)
+    {
+        
+    }
     public function api($url, $payload, $header = null)
     {
         foreach ($payload as $key => $value) {

@@ -28,7 +28,7 @@ class FavoriteController extends Controller
     {
         $params = $request->all();
 
-        if (!@$params['celeb_ext_id']) {
+        if (!@$params['external_id']) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid request'
@@ -36,11 +36,11 @@ class FavoriteController extends Controller
         }
 
         $user = $this->userService->getByID(auth('api')->user()->id);
-        $celebrity = $this->celebService->getModel(['external_id' => $params['celeb_ext_id']]);
+        $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
         if (!$celebrity) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unregisterd celebrity'
+                'message' => 'Can not find celebrity'
             ]);
         }
         $user->favorites()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
@@ -55,7 +55,7 @@ class FavoriteController extends Controller
     { 
         $params = $request->all();
         
-        if (!@$params['celeb_ext_id']) {
+        if (!@$params['external_id']) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid request'
@@ -63,11 +63,11 @@ class FavoriteController extends Controller
         }
         
         $user = $this->userService->getByID(auth('api')->user()->id);
-        $celebrity = $this->celebService->getModel(['external_id' => $params['celeb_ext_id']]);
+        $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
         if (!$celebrity) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unregisterd celebrity'
+                'message' => 'Can not find celebrity'
             ]);
         }
         $user->favorites()->detach($celebrity);
@@ -80,10 +80,11 @@ class FavoriteController extends Controller
     public function show(Request $request)
     {   
         $user = $this->userService->getByID(auth('api')->user()->id);
+        $lang = $user->lang;
         $favorites = $user->favorites;
         $data = [];
         foreach ($favorites as $item) {
-            $data[] = $this->celebService->getPersonalInfo($item->id);
+            $data[] = $this->celebService->getDetailInfo($item->id, $lang);
         }
         return response()->json(['success'=>true, 'data' => $data]);
     }

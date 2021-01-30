@@ -50,7 +50,11 @@ class CelebController extends Controller
                 'message' => 'Recommendation failed'
             ]);
         }
-        $data = $this->celebService->getRecommendations($keyword, $lang);
+        $data = [];
+        $recommends = $this->celebService->getRecommendations($keyword, $lang);
+        foreach ($recommends as $each) {
+            $data[] = $each['name'];
+        }
         // $data = ["Tom Hanks", "Tom Benette", "Tomson Wall"];
         return response()->json([
             'success' => true,
@@ -107,6 +111,7 @@ class CelebController extends Controller
                 'message' => 'Can not find celebrity'
             ]);
         }
+        $params['name'] = $this->celebService->getName($celebrity->id);
         $imdb = $this->cloudApiService->imdb($params);
         return response()->json([
             'success' => true,
@@ -117,12 +122,11 @@ class CelebController extends Controller
     /**
      * Search all videos related with celebrity
      * @param string name
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponses
      */
     public function video(Request $request)
     {
         $params = $request->all();
-        $name = $params['name'];
         $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
         if (!$celebrity) {
             return response()->json([
@@ -130,6 +134,7 @@ class CelebController extends Controller
                 'message' => 'Can not find celebrity'
             ]);
         }
+        $params['name'] = $this->celebService->getName($celebrity->id);
         $youtube = $this->cloudApiService->youtube($params);
         return response()->json([
             'success' => true,
@@ -145,7 +150,6 @@ class CelebController extends Controller
     public function news(Request $request)
     {
         $params = $request->all();
-        $name = $params['name'];
         $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
         if (!$celebrity) {
             return response()->json([
@@ -153,6 +157,7 @@ class CelebController extends Controller
                 'message' => 'Can not find celebrity'
             ]);
         }
+        $params['name'] = $this->celebService->getName($celebrity->id);
         $news = $this->cloudApiService->bing($params);
         return response()->json([
             'success' => true,
@@ -160,18 +165,39 @@ class CelebController extends Controller
         ]);
     }
 
-    public function section(Request $request)
+    /**
+     * Search description info by section number
+     * @param string name
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function description(Request $request)
     {
         $user = $this->userService->getByID(auth('api')->user()->id);
         $params = $request->all();
+        $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
+        if (!$celebrity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Can not find celebrity'
+            ]);
+        }
         $params['lang'] = $user->lang;
+        $params['name'] = $this->celebService->getName($celebrity->id);
         $data = $this->cloudApiService->wikiSection($params);
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Can not find information'
+            ]);
+        }
         return response()->json([
             'success' => true,
             'data' => $data
         ]);
     }
-
+    /**
+     * 
+     */
     protected function store($params)
     {
         $user = $this->userService->getByID(auth('api')->user()->id);
@@ -184,27 +210,27 @@ class CelebController extends Controller
             $celebrity = $this->celebService->getModel(['external_id' => $wiki['external_id']]);
             if (!$celebrity) {
                 $celebrity = new Celebrity();
-                $celebrity->external_id = @$wiki['external_id'];
-                $celebrity->photo_url = @$wiki['photo_url'];
-                $celebrity->birth_date = @$wiki['birth_date'];
-                $celebrity->death_date = @$wiki['death_date'];
-                $celebrity->facebook = @$wiki['facebook'];
-                $celebrity->instagram = @$wiki['instagram'];
-                $celebrity->twitter = @$wiki['twitter'];
+                $celebrity->external_id = @$wiki['external_id'] ? $wiki['external_id'] : '';
+                $celebrity->photo_url = @$wiki['photo_url'] ? $wiki['photo_url'] : '';
+                $celebrity->birth_date = @$wiki['birth_date'] ? $wiki['birth_date'] : '';
+                $celebrity->death_date = @$wiki['death_date'] ? $wiki['death_date'] : '';
+                $celebrity->facebook = @$wiki['facebook'] ? $wiki['facebook'] : '';
+                $celebrity->instagram = @$wiki['instagram'] ? $wiki['instagram'] : '';
+                $celebrity->twitter = @$wiki['twitter'] ? $wiki['twitter'] : '';
                 $celebrity->save();
             }
 
             $detail = new CelebDetail();
             $detail->celeb_id = $celebrity->id;
-            $detail->en_name = @$wiki['en_name'];
-            $detail->natl_name = @$wiki['natl_name'];
-            $detail->born_in = @$wiki['born_in'];
-            $detail->citizen_ship = @$wiki['citizen_ship'];
-            $detail->spouse = @$wiki['spouse'];
-            $detail->children = @$wiki['child'];
-            $detail->education = @$wiki['education'];
-            $detail->occupation = @$wiki['occupation'];
-            $detail->net_worth = @$wiki['net_worth'];
+            $detail->en_name = @$wiki['en_name'] ? $wiki['en_name'] : '';
+            $detail->natl_name = @$wiki['natl_name'] ? $wiki['natl_name'] : '';
+            $detail->born_in = @$wiki['born_in'] ? $wiki['born_in'] : '';
+            $detail->citizen_ship = @$wiki['citizen_ship'] ? implode('&', $wiki['citizen_ship']) : '';
+            $detail->spouse = @$wiki['spouse'] ? implode('&', array_map(function($item){return implode('|', $item);}, $wiki['spouse'])) : '';
+            $detail->children = @$wiki['child'] ? implode('&', $wiki['child']) : '' ;
+            $detail->education = @$wiki['education'] ? implode('&', $wiki['education']) : '';
+            $detail->occupation = @$wiki['occupation'] ? implode('&', $wiki['occupation']) : '';
+            $detail->net_worth = @$wiki['net_worth'] ? $wiki['net_worth'] : '';
             $detail->lang = $params['lang'];
             $detail->save();
         } else {
@@ -213,11 +239,10 @@ class CelebController extends Controller
 
         $user->histories()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
 
-        $data = [];
-        $data['about'] = $this->celebService->getDetailInfo($celebrity->id, $lang);
-        $data['video'] = $this->cloudApiService->youtube($params);
-        $data['movie'] = $this->cloudApiService->imdb($params);
-        $data['news'] = $this->cloudApiService->bing($params);
+        $data = $this->celebService->getDetailInfo($celebrity->id, $lang);
+        // $data['video'] = $this->cloudApiService->youtube($params);
+        // $data['movie'] = $this->cloudApiService->imdb($params);
+        // $data['news'] = $this->cloudApiService->bing($params);
         return $data;
     }
 
