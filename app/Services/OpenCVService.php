@@ -19,7 +19,8 @@ class OpenCVService extends BaseService
     }
     public function recognize($photo)
     {
-        
+        $faceClassifier = new CascadeClassifier();
+        $faceClassifier->load(public_path('opencv/models/lbpcascades/lbpcascade_frontalface.xml'));
         return null;
     }
 }
