@@ -19,6 +19,7 @@ class OpenCVService extends BaseService
     }
     public function recognize($photo)
     {
+        
         return null;
     }
 }
