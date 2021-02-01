@@ -26,11 +26,7 @@ class CreateCelebDetailTable extends Migration
             $table->string('occupation')->nullable();
             $table->string('net_worth')->nullable();
             $table->text('award')->nullable();
-            $table->text('early_life')->nullable();
-            $table->text('career')->nullable();
-            $table->text('filmography')->nullable();
-            $table->text('personal_life')->nullable();
-            $table->text('activities')->nullable();
+            $table->longtext('description')->nullable();
             $table->string('lang')->nullable();
             $table->foreign('celeb_id')->references('id')->on('ff_celebs')->onDelete('cascade');
 

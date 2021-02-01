@@ -30,7 +30,7 @@ class CelebService extends BaseService
     {
         $model = DB::table('ff_celebs as A')
             ->join('ff_celeb_detail as B', 'A.id', '=', 'B.celeb_id')
-            ->select('A.*', 'B.en_name', 'B.natl_name', 'B.born_in', 'B.citizen_ship', 'B.spouse', 'B.children', 'B.education', 'B.occupation', 'B.net_worth', 'B.lang')
+            ->select('A.*', 'B.en_name', 'B.natl_name', 'B.born_in', 'B.citizen_ship', 'B.spouse', 'B.children', 'B.education', 'B.occupation', 'B.net_worth', 'B.description', 'B.lang')
             ->where('B.lang', '=', $lang)
             ->where('B.celeb_id', '=', $id)
             ->first();
@@ -39,6 +39,7 @@ class CelebService extends BaseService
         $model->education = explode('&', $model->education);
         $model->occupation = explode('&', $model->occupation);
         $model->citizen_ship = explode('&', $model->citizen_ship);
+        $model->description = json_decode($model->description);
         return $model;
     }
     public function getRecommendations($keyword, $lang)

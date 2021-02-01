@@ -9,6 +9,8 @@ use Google\Cloud\Core\ServiceBuilder;
 use Aws\Rekognition\RekognitionClient;
 
 use WikitextParser;
+use PHPHtmlParser\Dom;
+use DiDom\Document;
 
 class CloudApiService extends BaseService
 {
@@ -321,28 +323,32 @@ class CloudApiService extends BaseService
                     $data[$field][] = $value;
             }
         }
-
-        $url = 'https://www.wikipedia.org/w/api.php?';
-        $payload = array (
-            'action' => 'parse',
-            'format' => 'json',
-            'page' => str_replace(' ', '%20', $name),
-            'prop' => 'sections'
-        );
-        $res = $this->api($url, $payload);
-        $sections = $res->parse->sections;
-        
-        $data['description'] = []; 
-        foreach ($sections as $section) {
-            if ($section->toclevel == 1) {
+        $data['description'] = [];
+        $document = new Document('https://'.$lang.'.wikipedia.org/wiki/'.str_replace(' ', '_', $name), true);
+        $sub_headings = $document->find('h2');
+        foreach($sub_headings as $sub_heading) {
+            if ($sub_heading->parent()->getAttribute('class') == 'mw-parser-output' &&
+                !str_contains($sub_heading->text(), "External links") &&
+                !str_contains($sub_heading->text(), "Further reading") &&
+                !str_contains($sub_heading->text(), "References") &&
+                !str_contains($sub_heading->text(), "Legacy")) {
+                $content = $sub_heading->html();
+                $temp = $sub_heading->nextSibling();
+                while ($temp && !$temp->has('h2')) {
+                    $content .= $temp->html();
+                    $temp = $temp->nextSibling();
+                    if (!$temp || $temp->has('h2'))
+                        break;
+                }
                 $data['description'][] = array (
-                    'section_id' => $section->index,
-                    'section_title' => $section->line
+                    'title' => $sub_heading->text(),
+                    'content' => $content
                 );
             }
         }
+        $data['description'] = json_encode($data['description']);
         return $data;
-    }
+    }   
     public function wikiSection($params)
     {
         $name = $params['name'];
@@ -425,3 +431,4 @@ class CloudApiService extends BaseService
         return json_decode($response);
     }
 }
+

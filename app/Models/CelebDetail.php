@@ -31,10 +31,7 @@ class CelebDetail extends Model
         'occupation',
         'net_worth',
         'award',
-        'early_life',
-        'filmography',
-        'personal_life',
-        'activites',
+        'description',
         'lang'
     ];
 

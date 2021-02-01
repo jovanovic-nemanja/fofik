@@ -231,6 +231,7 @@ class CelebController extends Controller
             $detail->education = @$wiki['education'] ? implode('&', $wiki['education']) : '';
             $detail->occupation = @$wiki['occupation'] ? implode('&', $wiki['occupation']) : '';
             $detail->net_worth = @$wiki['net_worth'] ? $wiki['net_worth'] : '';
+            $detail->description = @$wiki['description'] ? $wiki['description'] : '';
             $detail->lang = $params['lang'];
             $detail->save();
         } else {
@@ -240,7 +241,7 @@ class CelebController extends Controller
         $user->histories()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
 
         $data = $this->celebService->getDetailInfo($celebrity->id, $lang);
-        // $data['video'] = $this->cloudApiService->youtube($params);
+        // $data['video'] = $this->cloudApiService->youtube($params); 
         // $data['movie'] = $this->cloudApiService->imdb($params);
         // $data['news'] = $this->cloudApiService->bing($params);
         return $data;
