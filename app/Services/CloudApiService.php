@@ -164,18 +164,20 @@ class CloudApiService extends BaseService
         {
             $url = 'http://www.omdbapi.com/?&plot=full&apikey=b9b1735c&i='.$movie->id;
             $detail = $this->api($url, []);
-            $data[] = array (
-                'title' => @$detail->Title,
-                'year' => @$detail->Year,
-                'rated' => @$detail->Rated,
-                'runtime' => @$detail->Runtime,
-                'genre' => @$detail->Genre,
-                'plot' => @$detail->Plot,
-                'metascore' => @$detail->Metascore,
-                'imdbrating' => @$detail->imdbRating,
-                'imdbvotes' => @$detail->imdbVotes,
-                'poster_url' => @$detail->Poster
-            );
+            if (@$detail->Title) {
+                $data[] = array (
+                    'title' => @$detail->Title,
+                    'year' => @$detail->Year,
+                    'rated' => @$detail->Rated,
+                    'runtime' => @$detail->Runtime,
+                    'genre' => @$detail->Genre,
+                    'plot' => @$detail->Plot,
+                    'metascore' => @$detail->Metascore,
+                    'imdbrating' => @$detail->imdbRating,
+                    'imdbvotes' => @$detail->imdbVotes,
+                    'poster_url' => @$detail->Poster
+                );
+            }
         }
         return $data;
     }
