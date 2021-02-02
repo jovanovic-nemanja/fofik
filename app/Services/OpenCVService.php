@@ -26,7 +26,7 @@ class OpenCVService extends BaseService
 
         $gates = ['g1.jpg', 'g2.jpg', 'g3.jpg', 'g4.jpg', 'g5.jpg', 'g6.jpg', 'g7.jpg', 'g8.jpg', 'g9.jpg'];
         $test = ['t1.jpg', 't2.jpg', 't3.jpg', 't4.jpg'];
-        $labels = ['unknown', 'Bill Gates'];
+        $labels = ['unknown', 'Bill Gates', 'Angelina'];
         $faceImages = $faceLabels = [];
 
         foreach ($gates as $photo) {
@@ -42,17 +42,20 @@ class OpenCVService extends BaseService
         $faceRecognizer->train($faceImages, $faceLabels);
         
         $faceImages = $faceLabels = [];
-        foreach ($test as $photo) {
-            $src = imread(public_path('uploads/cv_photos/'.$photo));    
-            $gray = cvtColor($src, COLOR_BGR2GRAY);
-            $faceClassifier->detectMultiScale($gray, $faces);    
-            equalizeHist($gray, $gray);
-            foreach ($faces as $k => $face) {
-                $faceImages[] = $gray->getImageROI($face); // face coordinates to image
-                $faceLabels[] = 0;
-            }
+        $src = imread(public_path('uploads/cv_photos/faces.jpg'));    
+        $gray = cvtColor($src, COLOR_BGR2GRAY);
+        $faceClassifier->detectMultiScale($gray, $faces);    
+        equalizeHist($gray, $gray);
+        foreach ($faces as $k => $face) {
+            $faceImages[] = $gray->getImageROI($face); // face coordinates to image
+            $faceLabels[] = 2;
         }
         $faceRecognizer->update($faceImages, $faceLabels);
+
+
+        $faceRecognizer->write(public_path('uploads/cv_photos/lbph_model.xml'));
+        $faceRecognizer = LBPHFaceRecognizer::create();
+        $faceRecognizer->read(public_path('uploads/cv_photos/lbph_model.xml'));
 
         $src = imread(public_path('uploads/cv_photos/t5.jpg'));    
         $gray = cvtColor($src, COLOR_BGR2GRAY);
