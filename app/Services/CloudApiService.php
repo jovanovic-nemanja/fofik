@@ -327,6 +327,7 @@ class CloudApiService extends BaseService
         }
         $data['description'] = [];
         $document = new Document('https://'.$lang.'.wikipedia.org/wiki/'.str_replace(' ', '_', $name), true);
+        $data['photo_url'] = $document->find('table.infobox .image img')->getAttribute('src');
         $sub_headings = $document->find('h2');
         foreach($sub_headings as $sub_heading) {
             if ($sub_heading->parent()->getAttribute('class') == 'mw-parser-output' &&

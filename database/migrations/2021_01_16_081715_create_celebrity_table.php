@@ -17,8 +17,8 @@ class CreateCelebrityTable extends Migration
             $table->id();
             $table->string('external_id');
             $table->string('photo_url')->nullable();
-            $table->dateTime('birth_date')->nullable();
-            $table->dateTime('death_date')->nullable();
+            $table->string('birth_date')->nullable();
+            $table->string('death_date')->nullable();
             $table->dateTime('active_start_date')->nullable();
             $table->dateTime('active_end_date')->nullable();
             $table->string('facebook')->nullable();
