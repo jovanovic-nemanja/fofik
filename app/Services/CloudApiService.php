@@ -327,7 +327,7 @@ class CloudApiService extends BaseService
         }
         $data['description'] = [];
         $document = new Document('https://'.$lang.'.wikipedia.org/wiki/'.str_replace(' ', '_', $name), true);
-        $data['photo_url'] = $document->find('table.infobox .image img')->getAttribute('src');
+        $data['photo_url'] = $document->find('table.infobox .image img')[0]->getAttribute('src');
         $sub_headings = $document->find('h2');
         foreach($sub_headings as $sub_heading) {
             if ($sub_heading->parent()->getAttribute('class') == 'mw-parser-output' &&
@@ -386,7 +386,9 @@ class CloudApiService extends BaseService
             'q' => str_replace(' ',  '%20', $name),
             'count' => 20,
             'sortBy' => 'Date',
-            'since' => date_timestamp_get(date_create('2010-12-01'))
+            'cc' => 'en-US',
+            'mkt' => 'en-US',
+            'since' => date_timestamp_get(date_create('2010-12-01')),
         );
         $apikey = '165205352171421bbaecc8e9dc49cc7d';
         $header = array(
