@@ -115,7 +115,7 @@
                         text: "Vision API Traffic(Monthly)"
                     },
                     axisX:{
-                        valueFormatString: "MMM",
+                        valueFormatString: "MMM YYYY",
                         crosshair: {
                             enabled: true,
                             snapToDataPoint: true
@@ -141,7 +141,7 @@
                         showInLegend: true,
                         name: "Google",
                         markerType: "square",
-                        xValueFormatString: "MMM, YYYY",
+                        xValueFormatString: "MMMM, YYYY",
                         color: "#F08080",
                         dataPoints: googleDataPoint
                     },

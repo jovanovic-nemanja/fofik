@@ -176,6 +176,60 @@ class VisionTableSeeder extends Seeder
                 'vision_service' => 'google',
                 'created_on' => '2021-03-10'
             ),
+            array(
+                'id' => 36,
+                'vision_target' => 'Tom Hanks',
+                'vision_service' => 'google',
+                'created_on' => '2021-02-10'
+            ),
+            array(
+                'id' => 28,
+                'vision_target' => 'Tom Hanks',
+                'vision_service' => 'google',
+                'created_on' => '2021-04-10'
+            ),
+            array(
+                'id' => 29,
+                'vision_target' => 'Tom Hanks',
+                'vision_service' => 'google',
+                'created_on' => '2021-05-10'
+            ),
+            array(
+                'id' => 30,
+                'vision_target' => 'Tom Hanks',
+                'vision_service' => 'google',
+                'created_on' => '2021-06-10'
+            ),
+            array(
+                'id' => 31,
+                'vision_target' => 'Tom Hanks',
+                'vision_service' => 'google',
+                'created_on' => '2021-07-10'
+            ),
+            array(
+                'id' => 32,
+                'vision_target' => 'Tom Hanks',
+                'vision_service' => 'google',
+                'created_on' => '2021-08-10'
+            ),
+            array(
+                'id' => 33,
+                'vision_target' => 'Tom Hanks',
+                'vision_service' => 'google',
+                'created_on' => '2021-09-10'
+            ),
+            array(
+                'id' => 34,
+                'vision_target' => 'Tom Hanks',
+                'vision_service' => 'google',
+                'created_on' => '2021-10-10'
+            ),
+            array(
+                'id' => 35,
+                'vision_target' => 'Tom Hanks',
+                'vision_service' => 'google',
+                'created_on' => '2021-11-10'
+            ),
         ));
     }
 }

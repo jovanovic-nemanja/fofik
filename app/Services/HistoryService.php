@@ -53,7 +53,7 @@ class HistoryService extends BaseService
             ->whereMonth('created_on', '=', $month)
             ->groupBy('vision_service')
             ->get();
-            $date = $year.'-'.$month.'-01';
+            $date = $year.'-'.$month;
             if (@$result[0])
                 $monthly[$result[0]->service][$date] = $result[0]->count;
             if (@$result[1])
