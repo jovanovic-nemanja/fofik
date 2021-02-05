@@ -20,10 +20,24 @@ class CelebService extends BaseService
 
     public function getDetailModel($params)
     {
-        return CelebDetail::where('en_name', $params['name'])
-                          ->orWhere('natl_name', $params['name'])
-                          ->where('lang', $params['lang'])
-                          ->first();
+        $lang = $params['lang'];
+        $externalID = @$params['external_id'];
+        $name = @$params['name'];
+        if ($externalID) {
+            $model = $this->getModel(['external_id' => $externalID]);
+            if (!$model)
+                return null;
+            return CelebDetail::where('celeb_id', $model->id)
+                        ->where('lang', $lang)
+                        ->first();
+        }
+        if ($name) {
+            return CelebDetail::where('en_name', $name)
+                        ->orWhere('natl_name', $name)
+                        ->where('lang', $lang)
+                        ->first();
+        }
+        return null;
     }
 
     public function getDetailInfo($id, $lang)
@@ -40,6 +54,17 @@ class CelebService extends BaseService
         $model->occupation = explode('&', $model->occupation);
         $model->citizen_ship = explode('&', $model->citizen_ship);
         $model->description = json_decode($model->description);
+        return $model;
+    }
+
+    public function getBriefInfo($id, $lang)
+    {
+        $model = DB::table('ff_celebs as A')
+            ->join('ff_celeb_detail as B', 'A.id', '=', 'B.celeb_id')
+            ->select('A.external_id', 'A.photo_url', 'B.natl_name')
+            ->where('B.lang', '=', $lang)
+            ->where('B.celeb_id', '=', $id)
+            ->first();
         return $model;
     }
     public function getRecommendations($keyword, $lang)

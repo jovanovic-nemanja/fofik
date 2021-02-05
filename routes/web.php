@@ -19,6 +19,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/', 'PagesController@dashboard');
     Route::get('dashboard', 'PagesController@dashboard')->name('dashboard');
 
+    Route::get('/vision-history', 'HistoryController@visionHistory');
     /**
      * Users
      */
@@ -26,6 +27,15 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/data', 'UsersController@anyData')->name('users.data');
         Route::get('/users', 'UsersController@users')->name('users.users');
     });
+    /**
+     * OpenCV
+     */
+    Route::group(['prefix' => 'cv'], function () {
+        Route::get('/index', 'CVController@index')->name('cv.index');
+        Route::get('/add', 'CVController@add')->name('cv.add');
+        Route::post('/store', 'CVController@store')->name('cv.store');
+    });
+
     Route::resource('users', 'UsersController');
 });
 

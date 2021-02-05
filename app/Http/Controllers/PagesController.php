@@ -8,6 +8,11 @@ use DB;
 
 class PagesController extends Controller
 {
+    protected $historyService;
+    public function __construct()
+    {   
+
+    }
     /**
      * Dashobard view
      * @return mixed

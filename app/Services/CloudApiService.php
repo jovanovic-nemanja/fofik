@@ -14,10 +14,19 @@ use DiDom\Document;
 
 class CloudApiService extends BaseService
 {
+
+    protected $mapLangCode;
     public function __construct()
     {
-
-    }
+        $this->mapLangCode = array (
+            'en' => 'US', 
+            'tr' => 'TR', 
+            'fr' => 'FR', 
+            'de' => 'DE', 
+            'gb' => 'GB', 
+            'se' => 'SE', 
+        );
+    }   
 
     public function googleCV($photo)
     {
@@ -116,7 +125,7 @@ class CloudApiService extends BaseService
     public function youtube($params)
     {
         $name = $params['name'];
-
+        $lang = $params['lang'];
         $apikey = 'AIzaSyCZIfP_mQ6-EQzEB_ECRqxqjQQCmiIVJUA'; 
         // $googleApiUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' . str_replace(' ', '%20' , name) . '&maxResults=' . 10 . '&key=' . $apikey;
 
@@ -124,7 +133,9 @@ class CloudApiService extends BaseService
         $payload = array (
             'part' => 'snippet',
             'q' => str_replace(' ', '%20', $name),
-            'maxResults' => 20,   
+            'maxResults' => 20,
+            // 'regionCode' => 'TR',
+            'relevanceLanguage' => $lang
         );
         $res = $this->api($url, $payload);
         $data = [];
@@ -183,9 +194,11 @@ class CloudApiService extends BaseService
     }
     public function wikiBase($params)
     {        
-        $name = $params['name'];
-        $lang = $params['lang'];
+        $name = @$params['name'];
+        $lang = @$params['lang'];
 
+        if (!$name)
+            return null;
         // $lang = 'en';
         $url = 'https://www.wikidata.org/w/api.php?';
         $payload = array (
@@ -378,16 +391,19 @@ class CloudApiService extends BaseService
         }
         return $text;
     }
-    public function bing($params)
+    public function bingNews($params)
     {
-        $name = $params['name'];
+        $name = @$params['name'];
+        $lang = @$params['lang'];
+        if (!$name)
+            return [];
         $url = 'https://api.bing.microsoft.com/v7.0/news/search?';
         $payload = array (
             'q' => str_replace(' ',  '%20', $name),
             'count' => 20,
             'sortBy' => 'Date',
-            'cc' => 'en-US',
-            'mkt' => 'en-US',
+            // 'mkt' => 'tr-TR',
+            'cc' => $this->mapLangCode[$lang],
             'since' => date_timestamp_get(date_create('2010-12-01')),
         );
         $apikey = '165205352171421bbaecc8e9dc49cc7d';
@@ -395,6 +411,10 @@ class CloudApiService extends BaseService
             'Ocp-Apim-Subscription-Key:'.$apikey
         );
         $res = $this->api($url, $payload, $header);
+        if (count($res->value) == 0) {
+            $payload['cc'] = 'US';
+            $res = $this->api($url, $payload, $header);
+        }
         $data = [];
         foreach ($res->value as $news)
         {
@@ -406,6 +426,21 @@ class CloudApiService extends BaseService
                 'release_date' => $news->datePublished,
             );
         }
+        return $data;
+    }
+    public function bingEntities($keyword)
+    {
+        $url = 'https://api.bing.microsoft.com/v7.0/entities?';
+        $payload = array (
+            'q' => $keyword,
+            'mkt' => 'en-US',
+        );
+        $apikey = '165205352171421bbaecc8e9dc49cc7d';
+        $header = array(
+            'Ocp-Apim-Subscription-Key:'.$apikey
+        );
+        $res = $this->api($url, $payload, $header);
+        print_r($res); exit();
         return $data;
     }
     public function gNews($params)

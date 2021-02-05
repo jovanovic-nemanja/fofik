@@ -84,7 +84,7 @@ class FavoriteController extends Controller
         $favorites = $user->favorites;
         $data = [];
         foreach ($favorites as $item) {
-            $data[] = $this->celebService->getDetailInfo($item->id, $lang);
+            $data[] = $this->celebService->getBriefInfo($item->id, $lang);
         }
         return response()->json(['success'=>true, 'data' => $data]);
     }

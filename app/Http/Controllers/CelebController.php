@@ -9,6 +9,7 @@ use App\Services\CelebService;
 use App\Services\PhotoUploadService;
 use App\Services\CloudApiService;
 use App\Services\OpenCVService;
+use App\Services\HistoryService;
 
 use App\Models\Celebrity;
 use App\Models\CelebDetail;
@@ -23,13 +24,14 @@ class CelebController extends Controller
     protected $cloudApiService;
     protected $openCVService;
 
-    public function __construct(UserService $userService, CelebService $celebService, PhotoUploadService $photoUploadService, CloudApiService $cloudApiService, OpenCVService $openCVService) 
+    public function __construct(UserService $userService, CelebService $celebService, PhotoUploadService $photoUploadService, CloudApiService $cloudApiService, OpenCVService $openCVService, HistoryService $historyService) 
     {
         $this->userService = $userService;
         $this->celebService = $celebService;
         $this->photoUploadService = $photoUploadService;
         $this->cloudApiService = $cloudApiService;
         $this->openCVService = $openCVService;
+        $this->historyService = $historyService;
     }
     
     /**
@@ -51,11 +53,13 @@ class CelebController extends Controller
             ]);
         }
         $data = [];
+
         $recommends = $this->celebService->getRecommendations($keyword, $lang);
         foreach ($recommends as $each) {
             $data[] = $each['name'];
         }
         // $data = ["Tom Hanks", "Tom Benette", "Tomson Wall"];
+
         return response()->json([
             'success' => true,
             'data' => $data
@@ -73,16 +77,15 @@ class CelebController extends Controller
         $params = $request->all();
         if ($photo = $request->file('photo')) {
             $photo = $this->photoUploadService->uploadPhoto($photo);
-            $params['photo'] = $photo;
+            $name = $this->vision($photo);
+            if (!$name) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Can not find celebrity'    
+                ]);
+            }
+            $params['name'] = $name;
         }
-        $name = $this->vision($params);
-        if (!$name) {
-            return response()->json([
-                'success' => false, 
-                'message' => 'Can not find celebrity'
-            ]);
-        }
-        $params['name'] = $name;
         $data = $this->store($params);
         if (!$data) {
             return response()->json([
@@ -104,6 +107,8 @@ class CelebController extends Controller
     public function movie(Request $request)
     {
         $params = $request->all();
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        $params['lang'] = $user->lang;
         $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
         if (!$celebrity) {
             return response()->json([
@@ -127,6 +132,8 @@ class CelebController extends Controller
     public function video(Request $request)
     {
         $params = $request->all();
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        $params['lang'] = $user->lang;
         $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
         if (!$celebrity) {
             return response()->json([
@@ -150,6 +157,8 @@ class CelebController extends Controller
     public function news(Request $request)
     {
         $params = $request->all();
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        $params['lang'] = $user->lang;
         $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
         if (!$celebrity) {
             return response()->json([
@@ -158,7 +167,7 @@ class CelebController extends Controller
             ]);
         }
         $params['name'] = $this->celebService->getName($celebrity->id);
-        $news = $this->cloudApiService->bing($params);
+        $news = $this->cloudApiService->bingNews($params);
         return response()->json([
             'success' => true,
             'data' => $news
@@ -219,7 +228,6 @@ class CelebController extends Controller
                 $celebrity->twitter = @$wiki['twitter'] ? $wiki['twitter'] : '';
                 $celebrity->save();
             }
-
             $detail = new CelebDetail();
             $detail->celeb_id = $celebrity->id;
             $detail->en_name = @$wiki['en_name'] ? $wiki['en_name'] : '';
@@ -243,26 +251,35 @@ class CelebController extends Controller
         $data = $this->celebService->getDetailInfo($celebrity->id, $lang);
         // $data['video'] = $this->cloudApiService->youtube($params); 
         // $data['movie'] = $this->cloudApiService->imdb($params);
-        // $data['news'] = $this->cloudApiService->bing($params);
+        // $data['news'] = $this->cloudApiService->bingNews($params);
         return $data;
     }
 
-    protected function vision($params)
+    protected function vision($photo)
     {
-        if (@$params['name']) {
-            return $params['name'];
-        }
-        if ($photo = @$params['photo']) {
-            $name = $this->openCVService->recognize($photo);
-            if (!$name) {
-                $name = $this->cloudApiService->googleCV($photo);
-                if (!$name) {
-                    $name = $this->cloudApiService->amazonCV($photo);
-                    if (!$name)
-                        return null;
+        if (!$photo)
+            return null;
+        if ($name = $this->openCVService->recognize($photo)) {
+            return $name;
+        } else {
+            if ($name = $this->cloudApiService->googleCV($photo)) {
+                $this->historyService->addVisionHistory([
+                    'vision_target' => $name,
+                    'vision_service' => 'google',
+                    'created_on' => Date('Y-m-d')
+                ]);
+                return $name;
+            } else {
+                if ($name = $this->cloudApiService->amazonCV($photo)) {
+                    $this->historyService->addVisionHistory([
+                        'vision_target' => $name,
+                        'vision_service' => 'amazon',
+                        'created_on' => Date('Y-m-d')
+                    ]);
+                    return $name;
                 }
             }
-            return $name;
         }
+        return null;
     }
 }
