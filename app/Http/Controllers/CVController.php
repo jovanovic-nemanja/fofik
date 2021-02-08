@@ -38,9 +38,7 @@ class CVController extends Controller
             $cvPhotos[] = $model->photo = $this->photoUploadService->uploadPhoto($image, 'opencv');
             $model->save();
         }
-        print_r($cvPhotos); exit();
-        // $this->openCVService->updateModel($cvPhotos, $name);
-
+        $this->openCVService->updateModel($cvPhotos, $name);
         return response()->json([
             'success' => true
         ]);
