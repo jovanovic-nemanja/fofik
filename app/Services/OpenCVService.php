@@ -14,10 +14,10 @@ use const CV\{COLOR_BGR2GRAY};
 class OpenCVService extends BaseService
 {
 
-    protected $bTrained = false;
+    protected $bTrained;
     public function __construct()
     {
-
+        $this->bTrained = false;
     }
     public function recognize($photo)
     {
@@ -44,6 +44,8 @@ class OpenCVService extends BaseService
         if (file_exists(public_path('opencv/celeb_recognize_model.xml'))) {
             $this->bTrained = true;
             $faceRecognizer->read(public_path('opencv/celeb_recognize_model.xml'));
+        } else {
+            $this->bTrained = false;
         }
         return $faceRecognizer;
     }
@@ -60,7 +62,7 @@ class OpenCVService extends BaseService
         $faceImages = $faceLabels = [];
         foreach ($photos as $photo)
         {
-            $src = imread(public_path('opencv/photos/'.$photo));    
+            $src = imread(public_path($photo));    
             $gray = cvtColor($src, COLOR_BGR2GRAY);
             $faceClassifier->detectMultiScale($gray, $faces);    
             equalizeHist($gray, $gray);

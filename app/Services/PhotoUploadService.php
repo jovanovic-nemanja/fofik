@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Ramsey\Uuid\Uuid;
 use App\Traits\UploadFileTrait;
 
 class PhotoUploadService extends BaseService
@@ -13,10 +14,10 @@ class PhotoUploadService extends BaseService
 	
 	}
 
-    public function uploadPhoto($photo, $prefix = '')
-    {
-        $folder = '/uploads/photos/';
-        $name = $prefix.time();
+    public function uploadPhoto($photo, $prefix = 'uploads')
+    {        
+        $folder = $prefix.'/'.'photos'.'/';
+        $name = uniqid();
         $filePath = $folder.$name.'.'.$photo->getClientOriginalExtension();
         
         return $this->uploadOne($photo, $folder, 'store', $name);

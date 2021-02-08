@@ -31,8 +31,7 @@ Route::group(['middleware' => ['auth']], function () {
      * OpenCV
      */
     Route::group(['prefix' => 'cv'], function () {
-        Route::get('/index', 'CVController@index')->name('cv.index');
-        Route::get('/add', 'CVController@add')->name('cv.add');
+        Route::get('/', 'CVController@index')->name('cv.index');
         Route::post('/store', 'CVController@store')->name('cv.store');
     });
 
