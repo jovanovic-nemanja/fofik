@@ -45,11 +45,11 @@
             clickable:'#dropzone-images',
             paramName: 'images',
             acceptedFiles: "image/*",
-
         });
 
         myDropzone.on("success", function(file, response) {
             // window.location.href = ("/tasks/"+response.task_external_id)
+            $('input[type="submit"]').attr("disabled", false);
             console.log(file);
         });
 
