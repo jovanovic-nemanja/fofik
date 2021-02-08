@@ -21,21 +21,23 @@ class OpenCVService extends BaseService
     }
     public function recognize($photo)
     {
-        // $faceClassifier = $this->getClassifier();
-        // $faceRecognizer = $this->getModel();
+        $faceClassifier = $this->getClassifier();
+        $faceRecognizer = $this->getModel();
 
-        // if (!$this->bTrained)
-        //     return null;
+        if (!$this->bTrained)
+            return null;
 
-        // $src = imread(public_path('uploads/photos/'.$photo));    
-        // $gray = cvtColor($src, COLOR_BGR2GRAY);
-        // $faceClassifier->detectMultiScale($gray, $faces);   
-        // equalizeHist($gray, $gray);
-        // if (count($faces) == 0)
-        //     return null;
-        // $face = $faces[0];
-        // $faceImage = $gray->getImageROI($face); // face coordinates to image
-        // $faceLabel = $faceRecognizer->predict($faceImage, $faceConfidence);
+        $src = imread(public_path($photo));    
+        $gray = cvtColor($src, COLOR_BGR2GRAY);
+        $faceClassifier->detectMultiScale($gray, $faces);   
+        equalizeHist($gray, $gray);
+        if (count($faces) == 0)
+            return null;
+        $face = $faces[0];
+        $faceImage = $gray->getImageROI($face); // face coordinates to image
+        $faceLabel = $faceRecognizer->predict($faceImage, $faceConfidence);
+
+        print_r($faceLabels, $faceConfidence); exit();
         return null;
     }
     public function getModel()
