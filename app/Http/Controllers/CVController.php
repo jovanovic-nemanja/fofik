@@ -38,10 +38,14 @@ class CVController extends Controller
             return response()->json([
                 'success' => false
             ]);
-        }   
-        $model = new CVResource();
-        $model->name = $name;
-        $model->save();
+        }
+        
+        $model = CVResource::where(['name' => $name])->first();
+        if (!$model) {
+            $model = new CVResource();
+            $model->name = $name;
+            $model->save();
+        }
         $cvID = $model->id;
 
         foreach ($images as $image) {
@@ -51,7 +55,6 @@ class CVController extends Controller
             $model->save();
         }
         $this->openCVService->updateModel($cvPhotos, $cvID);
-        
         return response()->json([
             'success' => true
         ]);
