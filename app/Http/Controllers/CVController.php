@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 use App\Models\CVResource;
+use App\Models\CVPhoto;
 use App\Services\PhotoUploadService;
 use App\Services\OpenCVService;
 
@@ -32,13 +33,25 @@ class CVController extends Controller
         $name = $request->all()['name'];
         $images = $request->file('images');
         $cvPhotos = [];
+
+        if (!isset($name) || !isset($images)) {
+            return response()->json([
+                'success' => false
+            ]);
+        }   
+        $model = new CVResource();
+        $model->name = $name;
+        $model->save();
+        $cvID = $model->id;
+
         foreach ($images as $image) {
-            $model = new CVResource();
-            $model->name = $name;
+            $model = new CVPhoto();
+            $model->cv_id = $cvID;
             $cvPhotos[] = $model->photo = $this->photoUploadService->uploadPhoto($image, 'opencv');
             $model->save();
         }
-        $this->openCVService->updateModel($cvPhotos, $name);
+        $this->openCVService->updateModel($cvPhotos, $cvID);
+        
         return response()->json([
             'success' => true
         ]);

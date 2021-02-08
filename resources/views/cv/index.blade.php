@@ -7,7 +7,7 @@
 <form action="{{route('cv.store')}}" method="POST" id="createTaskForm">
     @csrf
     <div class="form-group">    
-        <lablel class="control-label">Celebrity Name</label>
+        <label class="control-label">Celebrity Name</label>
         <input type="text" class="form-control" name="name" placeholder="Type celebrity name here" />
     </div>
     <div class="form-group">

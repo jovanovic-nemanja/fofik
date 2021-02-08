@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CVResource extends Model
+class CVPhoto extends Model
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'ff_cv_resource';
+    protected $table = 'ff_cv_photos';
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +19,8 @@ class CVResource extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
+        'cv_id',
+        'photo',
     ];
 
     /**
