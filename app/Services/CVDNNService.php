@@ -73,8 +73,8 @@ class CVDNNService extends BaseService
     {
         $faceVectors = [];
 
-        $cvData = DB::table('ff_cv_resource A')
-            ->join('ff_cv_photo B', 'A.id', '=', 'B.cv_id')
+        $cvData = DB::table('ff_cv_resource as A')
+            ->join('ff_cv_photos as B', 'A.id', '=', 'B.cv_id')
             ->select('A.name as label', 'B.photo')
             ->where(true)
             ->get();
@@ -82,14 +82,13 @@ class CVDNNService extends BaseService
         foreach ($cvData as $item) {
             $label = $item->label;
             $photo = $item->photo;
-            $src = imread(pubilc_path($photo));
+            $src = imread(public_path($photo));
             $faces = $this->image2faces($src);
             foreach ($faces as $i => $face) {
                 $vec = $this->face2vec($face);
                 $faceVectors[$label.$i] = $vec->data();
             }
         }
-
         //var_export($faceVectors);
 
         $src = imread(public_path($photo));

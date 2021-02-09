@@ -264,8 +264,8 @@ class CelebController extends Controller
     {
         if (!$photo)
             return null;
-        // if ($name = $this->openCVService->recognize($photo)) {
-        if ($name = $this->cvDNNService->recognize($photo)) {
+        if ($name = $this->openCVService->recognize($photo)) {
+        // if ($name = $this->cvDNNService->recognize($photo)) {
             return $name; 
         } else {
             if ($name = $this->cloudApiService->googleCV($photo)) {

@@ -6,6 +6,7 @@ use Closure;
 use DB;
 
 use App\Models\CVPhoto;
+use App\Models\CVResource;
 
 use CV\Face\LBPHFaceRecognizer, CV\CascadeClassifier, CV\Scalar, CV\Point;
 use function CV\{imread, imwrite, cvtColor, equalizeHist};
@@ -36,8 +37,11 @@ class OpenCVService extends BaseService
         $face = $faces[0];
         $faceImage = $gray->getImageROI($face); // face coordinates to image
         $faceLabel = $faceRecognizer->predict($faceImage, $faceConfidence);
-
         // print_r($faceLabel, $faceConfidence); exit();
+        if ($faceConfidence < 88) {
+            $cvData = CVResource::find($faceLabel)->first();
+            return isset($cvData) ? $cvData->name : null;
+        }
         return null;
     }
     public function getModel()
