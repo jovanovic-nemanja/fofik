@@ -9,6 +9,7 @@ use App\Services\CelebService;
 use App\Services\PhotoUploadService;
 use App\Services\CloudApiService;
 use App\Services\OpenCVService;
+use App\Services\CVDNNService;
 use App\Services\HistoryService;
 
 use App\Models\Celebrity;
@@ -23,14 +24,16 @@ class CelebController extends Controller
     protected $photoUploadService;
     protected $cloudApiService;
     protected $openCVService;
+    protected $cvDNNService;
 
-    public function __construct(UserService $userService, CelebService $celebService, PhotoUploadService $photoUploadService, CloudApiService $cloudApiService, OpenCVService $openCVService, HistoryService $historyService) 
+    public function __construct(UserService $userService, CelebService $celebService, PhotoUploadService $photoUploadService, CloudApiService $cloudApiService, OpenCVService $openCVService, CVDNNService $cvDNNService, HistoryService $historyService) 
     {
         $this->userService = $userService;
         $this->celebService = $celebService;
         $this->photoUploadService = $photoUploadService;
         $this->cloudApiService = $cloudApiService;
         $this->openCVService = $openCVService;
+        $this->cvDNNService = $cvDNNService;
         $this->historyService = $historyService;
     }
     
@@ -249,6 +252,8 @@ class CelebController extends Controller
         $user->histories()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
 
         $data = $this->celebService->getDetailInfo($celebrity->id, $lang);
+
+        $data->favorite = $user->hasInFavList($celebrity->id);
         // $data['video'] = $this->cloudApiService->youtube($params); 
         // $data['movie'] = $this->cloudApiService->imdb($params);
         // $data['news'] = $this->cloudApiService->bingNews($params);
@@ -259,8 +264,9 @@ class CelebController extends Controller
     {
         if (!$photo)
             return null;
-        if ($name = $this->openCVService->recognize($photo)) {
-            return $name;
+        // if ($name = $this->openCVService->recognize($photo)) {
+        if ($name = $this->cvDNNService->recognize($photo)) {
+            return $name; 
         } else {
             if ($name = $this->cloudApiService->googleCV($photo)) {
                 $this->historyService->addVisionHistory([

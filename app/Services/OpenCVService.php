@@ -37,7 +37,7 @@ class OpenCVService extends BaseService
         $faceImage = $gray->getImageROI($face); // face coordinates to image
         $faceLabel = $faceRecognizer->predict($faceImage, $faceConfidence);
 
-        print_r($faceLabels, $faceConfidence); exit();
+        // print_r($faceLabel, $faceConfidence); exit();
         return null;
     }
     public function getModel()

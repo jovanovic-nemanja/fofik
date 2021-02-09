@@ -168,7 +168,9 @@ class JwtAuthController extends Controller
         $validator = Validator::make($request->all(), [
             'access_token'  => 'required',
             'username'      => 'required',
-            'email'         => 'required'
+            'email'         => 'required',  
+            'social_id'     => 'required',
+            'social_site'   => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -179,6 +181,8 @@ class JwtAuthController extends Controller
         $token = $params['access_token'];
         $name  = $params['username'];
         $email = $params['email'];
+        $socialID = $params['social_id'];
+        $socialSite = $params['social_site'];
 
         $user = User::where(['access_token' => $token])->first();
         if (!$user) {
@@ -190,6 +194,9 @@ class JwtAuthController extends Controller
 
         $user->name = $name;
         $user->email = $email;
+        $user->social_id = $socialID;
+        $user->social_site = $socialSite;
+        
         $user->update();
 
         return response()->json([
