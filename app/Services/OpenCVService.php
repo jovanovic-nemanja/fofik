@@ -39,7 +39,7 @@ class OpenCVService extends BaseService
         $faceLabel = $faceRecognizer->predict($faceImage, $faceConfidence);
         // print_r($faceLabel, $faceConfidence); exit();
         if ($faceConfidence < 88) {
-            $cvData = CVResource::find($faceLabel)->first();
+            $cvData = CVResource::where(['id' => $faceLabel])->first();
             return isset($cvData) ? $cvData->name : null;
         }
         return null;
