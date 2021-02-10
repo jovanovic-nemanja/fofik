@@ -177,6 +177,25 @@ class CelebController extends Controller
         ]);
     }
 
+    public function event(Request $request)
+    {
+        $params = $request->all();
+        $user = $this->userService->getByID(auth('api')->user()->id);
+        $params['lang'] = $user->lang;
+        $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
+        if (!$celebrity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Can not find celebrity'
+            ]);
+        }
+        $params['name'] = $this->celebService->getName($celebrity->id);
+        $news = $this->cloudApiService->predictHQ($params);
+        return response()->json([
+            'success' => true,
+            'data' => $news
+        ]);
+    }
     /**
      * Search description info by section number
      * @param string name
@@ -231,7 +250,7 @@ class CelebController extends Controller
                 $celebrity->twitter = @$wiki['twitter'] ? $wiki['twitter'] : '';
                 $celebrity->save();
             }
-            $detail = new CelebDetail();
+            $detail = new CelebDetail(); 
             $detail->celeb_id = $celebrity->id;
             $detail->en_name = @$wiki['en_name'] ? $wiki['en_name'] : '';
             $detail->natl_name = @$wiki['natl_name'] ? $wiki['natl_name'] : '';

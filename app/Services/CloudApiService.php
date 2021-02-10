@@ -403,7 +403,7 @@ class CloudApiService extends BaseService
             'count' => 20,
             'sortBy' => 'Date',
             // 'mkt' => 'tr-TR',
-            'cc' => $this->mapLangCode[$lang],
+            'cc' => isset($this->mapLangCode[$lang]) ? $this->mapLangCode[$lang] : 'US',
             'since' => date_timestamp_get(date_create('2010-12-01')),
         );
         $apikey = '165205352171421bbaecc8e9dc49cc7d';
@@ -451,13 +451,47 @@ class CloudApiService extends BaseService
     {
         
     }
+    public function predictHQ($params)
+    {
+        $name = $params['name'];
+        $lang = $params['lang'];
+        $url = 'https://api.predicthq.com/v1/events?';
+        $ACCESS_TOKEN = "kwSQdX9mVF_nFyorO8nAnDkYYP1qtSZPT0s9hiPd";
+        $payload = array (
+            'q' => str_replace(' ', '+', $name),
+            'limit' => 10,
+            'country' => isset($this->mapLangCode[$lang]) ? $this->mapLangCode[$lang] : 'US'
+        );
+        $header = array (
+            "Authorization: Bearer $ACCESS_TOKEN",
+            "Accept: application/json"
+        );
+        $res = $this->api($url, $payload, $header);
+        if (count($res->results) == 0) {
+            $payload['country'] = 'US';
+            $res = $this->api($url, $payload, $header);
+        }
+        $data = [];
+        foreach ($res->results as $event) {
+            $data[] = array (
+                'title' => $event->title,
+                'description' => $event->description,
+                'category' => $event->category,
+                'duration' => $event->duration,
+                'start' => $event->start,
+                'end' => $event->end,
+                'updated' => $event->updated,
+                'first_seen' => $event->first_seen,
+            );
+        }
+        return $data;
+    }
     public function api($url, $payload, $header = null)
     {
         foreach ($payload as $key => $value) {
             $url .= ('&'.$key.'='.$value);
         }
         $ch = curl_init($url);
-        
         if (!$header)
             curl_setopt($ch, CURLOPT_HEADER, 0);
         else
@@ -466,7 +500,9 @@ class CloudApiService extends BaseService
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         $response = curl_exec($ch);
+        $status = curl_getinfo($ch);
         curl_close($ch);
         return json_decode($response);
     }

@@ -50,6 +50,7 @@ Route::group([
     Route::post('/video', [CelebController::class, 'video']);
     Route::post('/movie', [CelebController::class, 'movie']);
     Route::post('/news', [CelebController::class, 'news']);
+    Route::post('/event', [CelebController::class, 'event']);
 
     Route::post('/descr', [CelebController::class, 'description']);
 
