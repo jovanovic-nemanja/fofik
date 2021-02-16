@@ -7,7 +7,7 @@
 <form action="{{route('cv.store')}}" method="POST" id="createTaskForm">
     @csrf
     <div class="form-group">    
-        <label class="control-label">Celebrity Name</label>
+        <h3>Celebrity Name</h3>
         <input type="text" class="form-control" name="name" placeholder="Type celebrity name here" />
     </div>
     <div class="form-group">
@@ -25,6 +25,14 @@
         <input type="submit" class="btn btn-primary" value="Upload" />
     </div>
 </form>
+
+<!-- Test recognition -->
+<div class="test-box" style="margin-top: 60px;">
+<h3>Test Box</h3>
+<input type="file" class="test-img" name="test-img" accept="image/*">
+
+<button class="recognize btn btn-primary" style="margin-top:20px">Test</button>
+</div>
 @stop
 
 @push('scripts')
@@ -66,6 +74,23 @@
                 myDropzone.processQueue();
             else
                 alert("Please select image files");
+        })
+
+        // Test recognition
+        $('.recognize').click(function () {
+            var formData = new FormData();
+            formData.append('photo', $('.test-img')[0].files[0]);
+            $.ajax({
+                url: 'cv/test',
+                type: 'post',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    console.log(result);
+                }
+            })
         })
     });
 </script>

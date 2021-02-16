@@ -59,4 +59,17 @@ class CVController extends Controller
             'success' => true
         ]);
     }
+
+    // Test recognition
+    public function test(Request $request)
+    {
+        $name = null;
+        if ($photo = $request->file('photo')) {
+            $photo = $this->photoUploadService->uploadPhoto($photo);
+            $name = $this->openCVService->recognize($photo);
+        }
+        return response()->json([
+            'name' => $name ? $name : 'can not recognize',
+        ]);
+    }
 }

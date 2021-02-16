@@ -29,13 +29,10 @@ class CVDNNService extends BaseService
         $minSide = min($size->width, $size->height);
         $divider = $minSide / 300;
         \CV\resize($src, $resized, new Size($size->width / $divider, $size->height / $divider)); // 1200x300
-        //var_export($resized);
         $blob = \CV\DNN\blobFromImage($resized, 1, new Size(), new Scalar(104, 177, 123), true, false);
 
-        $this->netDet->setInput($blob);
+        $this->netDet->setInput($blob, "");
         $r = $this->netDet->forward();
-
-        //var_export($r->shape);
 
         $faces = [];
 
@@ -51,14 +48,14 @@ class CVDNNService extends BaseService
                 $faces[] = $src->getImageROI(new \CV\Rect($startX, $startY, $endX - $startX, $endY - $startY));
             }
         }
-
+ 
         return $faces;
     }
     public function face2vec($face) 
     {
         $blob = \CV\DNN\blobFromImage($face, 1.0 / 255, new Size(96, 96), new Scalar(), true, false);
-        $netRecogn->setInput($blob);
-        return $netRecogn->forward();
+        $this->netRecogn->setInput($blob, "");
+        return $this->netRecogn->forward();
     }
 
     public function faceDistance($face1, $face2)
@@ -76,7 +73,6 @@ class CVDNNService extends BaseService
         $cvData = DB::table('ff_cv_resource as A')
             ->join('ff_cv_photos as B', 'A.id', '=', 'B.cv_id')
             ->select('A.name as label', 'B.photo')
-            ->where(true)
             ->get();
 
         foreach ($cvData as $item) {
@@ -101,13 +97,12 @@ class CVDNNService extends BaseService
         $faceLabel = '';
         foreach ($faceVectors as $label => $faceVector) {
             $distance = faceDistance($vec->data(), $faceVector);
-
             if (!$minDistance || $distance < $minDistance) {
                 $minDistance = $distance;
                 $faceLabel = $label;
             }
         }
-
+        
         $similarity = intval((max(sqrt(2), $minDistance) - $minDistance) / sqrt(2) * 100);
         echo "face $faceLabel distance: $minDistance, similarity: $similarity%\n";
         exit();

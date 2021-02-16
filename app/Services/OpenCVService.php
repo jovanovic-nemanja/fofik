@@ -14,7 +14,6 @@ use const CV\{COLOR_BGR2GRAY};
 
 class OpenCVService extends BaseService
 {
-
     protected $bTrained;
     public function __construct()
     {
@@ -30,7 +29,7 @@ class OpenCVService extends BaseService
 
         $src = imread(public_path($photo));    
         $gray = cvtColor($src, COLOR_BGR2GRAY);
-        $faceClassifier->detectMultiScale($gray, $faces);   
+        $faceClassifier->detectMultiScale($gray, $faces);
         equalizeHist($gray, $gray);
         if (count($faces) == 0)
             return null;
