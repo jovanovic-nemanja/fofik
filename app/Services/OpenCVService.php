@@ -88,8 +88,12 @@ class OpenCVService extends BaseService
         $data = [];
         foreach ($records as $record)
         {
-            $photos = CVPhoto::where(['cv_id' => $record->id])->get();
-            $data[$record->name] = $photos;
+            $rrs = CVPhoto::where(['cv_id' => $record->id])->get();
+            $data[$record->name] = [];
+            foreach ($rrs as $rr) 
+            {
+                $data[$record->name][] = $rr->photo;
+            }
         }
         return $data;
     }
