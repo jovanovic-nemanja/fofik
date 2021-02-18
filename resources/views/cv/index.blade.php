@@ -4,34 +4,49 @@
 @stop
 
 @section('content')
-<form action="{{route('cv.store')}}" method="POST" id="createTaskForm">
-    @csrf
-    <div class="form-group">    
-        <h3>Celebrity Name</h3>
-        <input type="text" class="form-control" name="name" placeholder="Type celebrity name here" />
-    </div>
-    <div class="form-group">
-        <div class="tablet">
-            <div class="tablet__body">
-                    <label class="control-label">
-                        <h3>Drop files here or click to upload</h3>
-                    </label>
-                    <div class="dropzone dz-default dz-message" id="dropzone-images">
-                    </div>
+<div class="row">
+    <div class="col-md-6">
+        <h3>Registered Celebrities</h3>
+        @foreach ($celebs as $name => $photos)
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target={{$name}} aria-expanded="false" aria-controls={{$name}}>{{$name}}</button>
+        <div class="collapse" id={{$name}}>
+            <div class="card card-body">
+                test test test test
             </div>
         </div>
+        @endforeach
     </div>
-    <div class="form-group">
-        <input type="submit" class="btn btn-primary" value="Upload" />
+    <div class="col-md-6">
+        <form action="{{route('cv.store')}}" method="POST" id="createTaskForm">
+            @csrf
+            <div class="form-group">    
+                <h3>Add New</h3>
+                <input type="text" class="form-control" name="name" placeholder="Type celebrity name here" />
+            </div>
+            <div class="form-group">
+                <div class="tablet">
+                    <div class="tablet__body">
+                            <label class="control-label">
+                                <h3>Drop files here or click to upload</h3>
+                            </label>
+                            <div class="dropzone dz-default dz-message" id="dropzone-images">
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Upload" />
+            </div>
+        </form>
+
+        <!-- Test recognition -->
+        <div class="test-box" style="margin-top: 60px;">
+        <h3>Test Box</h3>
+        <input type="file" class="test-img" name="test-img" accept="image/*">
+
+        <button class="recognize btn btn-primary" style="margin-top:20px">Test</button>
+        </div>
     </div>
-</form>
-
-<!-- Test recognition -->
-<div class="test-box" style="margin-top: 60px;">
-<h3>Test Box</h3>
-<input type="file" class="test-img" name="test-img" accept="image/*">
-
-<button class="recognize btn btn-primary" style="margin-top:20px">Test</button>
 </div>
 @stop
 

@@ -22,7 +22,9 @@ class CVController extends Controller
     }
     public function index()
     {
-        return view('cv.index');
+        $list = $this->openCVService->getAllRecords();
+        return view('cv.index')
+                ->with('celebs', $list);
     }
     public function add()
     {

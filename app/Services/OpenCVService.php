@@ -81,4 +81,16 @@ class OpenCVService extends BaseService
             $faceRecognizer->update($faceImages, $faceLabels);
         $faceRecognizer->write(public_path('opencv/celeb_recognize_model.xml'));
     }
+
+    public function getAllRecords()
+    {
+        $records = CVResource::all();
+        $data = [];
+        foreach ($records as $record)
+        {
+            $photos = CVPhoto::where(['cv_id' => $record->id])->get();
+            $data[$record->name] = $photos;
+        }
+        return $data;
+    }
 }
