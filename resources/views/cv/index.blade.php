@@ -8,12 +8,20 @@
     <div class="col-md-6">
         <h3>Registered Celebrities</h3>
         @foreach ($celebs as $name => $photos)
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target={{$name}} aria-expanded="false" aria-controls={{$name}}>{{$name}}</button>
-        <div class="collapse" id={{$name}}>
+		<div class="celebrity">
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="<?='#'.str_replace(' ','-', $name)?>" aria-expanded="false" aria-controls="<?='#'.str_replace(' ','-', $name)?>">{{$name}}</button>
+        <div class="collapse" id="<?=str_replace(' ','-', $name)?>">
             <div class="card card-body">
-                test test test test
+                @foreach ($photos as $photo)
+                <div class="gallery">
+                    <a target="_blank" href="<?='https://dbd.fofik.com/'.$photo?>">
+                        <img src="<?='https://dbd.fofik.com/'.$photo?>" alt="Cinque Terre">
+                    </a>
+                </div>
+                @endforeach
             </div>
         </div>
+		</div>
         @endforeach
     </div>
     <div class="col-md-6">
@@ -52,7 +60,15 @@
 
 @push('scripts')
 <style type="text/css">
-
+    .celebrity {
+		margin: 15px 0px;
+	}
+    .gallery {
+        margin: 5px;
+        border: 1px solid #ccc;
+        float: left;
+        width: 100px;
+    }
 </style>
 
 <script>
