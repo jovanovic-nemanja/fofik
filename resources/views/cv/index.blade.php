@@ -15,7 +15,7 @@
                 @foreach ($photos as $photo)
                 <div class="gallery">
                     <a target="_blank" href="<?='https://dbd.fofik.com/'.$photo?>">
-                        <img src="<?='https://dbd.fofik.com/'.$photo?>" alt="Cinque Terre">
+                        <img src="<?='https://dbd.fofik.com/'.$photo?>" alt="Cinque Terre" width="120px" height="120px">
                     </a>
                 </div>
                 @endforeach
@@ -62,12 +62,13 @@
 <style type="text/css">
     .celebrity {
 		margin: 15px 0px;
+        display: grid;
 	}
     .gallery {
         margin: 5px;
-        border: 1px solid #ccc;
         float: left;
-        width: 100px;
+        width: 120px;
+        border-radius: 20px;
     }
 </style>
 
