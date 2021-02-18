@@ -36,8 +36,7 @@ class OpenCVService extends BaseService
         $face = $faces[0];
         $faceImage = $gray->getImageROI($face); // face coordinates to image
         $faceLabel = $faceRecognizer->predict($faceImage, $faceConfidence);
-        // print_r($faceLabel, $faceConfidence); exit();
-        if ($faceConfidence < 88) {
+        if ($faceConfidence < 80) {
             $cvData = CVResource::where(['id' => $faceLabel])->first();
             return isset($cvData) ? $cvData->name : null;
         }
@@ -57,7 +56,7 @@ class OpenCVService extends BaseService
     public function getClassifier()
     {
         $faceClassifier = new CascadeClassifier();
-        $faceClassifier->load(public_path('opencv/models/lbpcascades/lbpcascade_frontalface.xml'));
+        $faceClassifier->load(public_path('opencv/models/lbpcascades/lbpcascade_frontalface_improved.xml'));
         return $faceClassifier;
     }
     public function updateModel($photos, $label)

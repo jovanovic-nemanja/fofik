@@ -46,7 +46,7 @@
         var myDropzone = new Dropzone("#createTaskForm", {
             autoProcessQueue: false,
             uploadMultiple: true,
-            parallelUploads: 5,
+            parallelUploads: 10,
             maxFiles: 50,
             addRemoveLinks: true,
             previewsContainer: "#dropzone-images",
@@ -88,7 +88,7 @@
                 contentType: false,
                 processData: false,
                 success: function (result) {
-                    console.log(result);
+                    alert(result.name);
                 }
             })
         })
