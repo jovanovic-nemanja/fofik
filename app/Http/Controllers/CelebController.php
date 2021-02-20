@@ -120,13 +120,21 @@ class CelebController extends Controller
             ]);
         }
         $params['name'] = $this->celebService->getName($celebrity->id);
-        $imdb = $this->cloudApiService->imdb($params);
+        $tmdb = $this->cloudApiService->tmdb($params);
+        return response()->json([
+            'success' => true,
+            'data' => $tmdb
+        ]);
+    }
+
+    public function movieDetail($id)
+    {
+        $imdb = $this->cloudApiService->imdb($id);
         return response()->json([
             'success' => true,
             'data' => $imdb
         ]);
     }
-
     /**
      * Search all videos related with celebrity
      * @param string name

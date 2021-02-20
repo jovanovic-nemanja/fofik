@@ -151,44 +151,45 @@ class CloudApiService extends BaseService
         }
         return $data;
     }
-    public function imdb($params)
+    public function imdb($id)
+    {
+        $apiKey = '714ccbfe04acc9c6ec4e8b1e31f09d79';
+        $url = 'https://api.themoviedb.org/3/movie/'.$id.'/external_ids?';
+        $payload = array (
+            'api_key' => $apiKey,
+        );
+        $res = $this->api($url, $payload);
+        $imdbID = $res->imdb_id;
+        return array (
+            'imdb_id' => $imdbID,
+            'link' => 'https://www.imdb.com/title/'.$imdbID
+        );
+    }
+    public function tmdb($params)
     {
         $name = $params['name'];
-        // $lang = $params['lang'];
-        $lang = 'en';
-        $apikey = 'k_eljtb34t';
-        $url = 'https://imdb-api.com/'.$lang.'/API/SearchName/'.$apikey.'/'.str_replace(' ', '%20', $name);
-        $res = $this->api($url, []);
+        $lang = $params['lang'];
+        $apiKey = '714ccbfe04acc9c6ec4e8b1e31f09d79';
+        $url = 'https://api.themoviedb.org/3/search/person?';
+        $payload = array (
+          'api_key' => $apiKey,
+          'language' => isset($this->mapLangCode[$lang]) ? $lang.'-'.$this->mapLangCode[$lang] : 'en-US',
+          'query' => str_replace(' ', '+', $name),  
+        );  
+        $res = $this->api($url, $payload);
         if (count($res->results) == 0)
             return null;
-        $nmId = $res->results[0]->id;
-        $url = 'https://imdb-api.com/en/API/Name/'.$apikey.'/'.$nmId;
-        $res = $this->api($url, []);
-
-        $start = 0;
-        $length = 10;
-
-        $movies = $res->castMovies;
-        $movies = array_splice($movies, $start, $length);
-
-        foreach ($movies as $movie)
+        $pID = $res->results[0]->id;
+        $url = 'https://api.themoviedb.org/3/person/'.$pID.'/movie_credits?';
+        unset($payload['query']);
+        $res = $this->api($url, $payload);
+        foreach ($res->cast as $movie)
         {
-            $url = 'http://www.omdbapi.com/?&plot=full&apikey=b9b1735c&i='.$movie->id;
-            $detail = $this->api($url, []);
-            if (@$detail->Title) {
-                $data[] = array (
-                    'title' => @$detail->Title,
-                    'year' => @$detail->Year,
-                    'rated' => @$detail->Rated,
-                    'runtime' => @$detail->Runtime,
-                    'genre' => @$detail->Genre,
-                    'plot' => @$detail->Plot,
-                    'metascore' => @$detail->Metascore,
-                    'imdbrating' => @$detail->imdbRating,
-                    'imdbvotes' => @$detail->imdbVotes,
-                    'poster_url' => @$detail->Poster
-                );
-            }
+            $data[] = array (
+                'id' => $movie->id,
+                'title' => $movie->title,
+                'poster_url' => 'https://image.tmdb.org/t/p/original/'.$movie->poster_path
+            );
         }
         return $data;
     }
@@ -323,19 +324,22 @@ class CloudApiService extends BaseService
 
         foreach ($res->entities as $entId => $entVal)
         {
-            $value = $entVal->labels->{$lang}->value;
-            $field = $entities[$entId]['field'];
-            $is_arr = $entities[$entId]['mul'];
-            $meta = @$entities[$entId]['meta'] ? $entities[$entId]['meta'] : null;
-            if (!$is_arr) {
-                $data[$field] = $value;
-            } else {
-                if (!@$data[$field]) 
-                    $data[$field] = [];
-                if ($meta)
-                    $data[$field][] = array_merge(array($value), $meta);
-                else
-                    $data[$field][] = $value;
+            if (isset($entVal->labels->{$lang}))
+            {
+                $value = $entVal->labels->{$lang}->value;
+                $field = $entities[$entId]['field'];
+                $is_arr = $entities[$entId]['mul'];
+                $meta = @$entities[$entId]['meta'] ? $entities[$entId]['meta'] : null;
+                if (!$is_arr) {
+                    $data[$field] = $value;
+                } else {
+                    if (!@$data[$field]) 
+                        $data[$field] = [];
+                    if ($meta)
+                        $data[$field][] = array_merge(array($value), $meta);
+                    else
+                        $data[$field][] = $value;
+                }
             }
         }
         $data['description'] = [];
@@ -356,6 +360,7 @@ class CloudApiService extends BaseService
                     if (!$temp || $temp->has('h2'))
                         break;
                 }
+                $content = str_replace('/wiki/', 'https://'.$lang.'.wikipedia.org/wiki/', $content);
                 $data['description'][] = array (
                     'title' => $sub_heading->text(),
                     'content' => $content

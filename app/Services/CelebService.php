@@ -32,10 +32,16 @@ class CelebService extends BaseService
                         ->first();
         }
         if ($name) {
-            return CelebDetail::where('en_name', $name)
-                        ->orWhere('natl_name', $name)
-                        ->where('lang', $lang)
-                        ->first();
+            return DB::table('ff_celeb_detail')
+				    ->where(function($query) use ($name, $lang) {
+						$query->where('en_name', $name);
+						$query->where('lang', $lang);
+					})
+					->orWhere(function($query) use ($name, $lang) {
+						$query->where('natl_name', $name);
+						$query->where('lang', $lang);
+					})
+					->first();
         }
         return null;
     }
