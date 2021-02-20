@@ -370,32 +370,6 @@ class CloudApiService extends BaseService
         $data['description'] = json_encode($data['description']);
         return $data;
     }   
-    public function wikiSection($params)
-    {
-        $name = $params['name'];
-        $section_id = $params['section_id'];
-        $lang = $params['lang'];
-
-        $url = 'https://'.$lang.'.wikipedia.org/w/api.php?';
-        $payload = array (
-            'action' => 'parse',
-            'format' => 'json',
-            'prop' => 'text',
-            'mobileformat' => 1,
-            'disabletoc' => 1,
-            'section' => $section_id,
-            'page' => str_replace(' ', '%20', $name)
-        );
-        $data = $this->api($url, $payload);
-        try {
-            $text = $data->parse->text->{'*'};
-            $text = preg_replace("/\r|\n/", "", $text);
-            $text = preg_replace("/\"/", "", $text);
-        } catch(Exception $e) {
-            return null;
-        }
-        return $text;
-    }
     public function bingNews($params)
     {
         $name = @$params['name'];

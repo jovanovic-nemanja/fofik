@@ -204,31 +204,33 @@ class CelebController extends Controller
             'data' => $news
         ]);
     }
-    /**
-     * Search description info by section number
-     * @param string name
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function description(Request $request)
+
+    public function popular(Request $request)
     {
-        $user = $this->userService->getByID(auth('api')->user()->id);
-        $params = $request->all();
-        $celebrity = $this->celebService->getModel(['external_id' => $params['external_id']]);
-        if (!$celebrity) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Can not find celebrity'
-            ]);
+        $uid = auth('api')->user()->id;
+        $user = $this->userService->getByID($uid);
+        $histories = $this->historyService->getHRSearchHistory($uid);
+        $data = [];
+        foreach ($histories as $item)
+        {
+            $data[] = $this->celebService->getBriefInfo($item->celeb_id, $user->lang);
         }
-        $params['lang'] = $user->lang;
-        $params['name'] = $this->celebService->getName($celebrity->id);
-        $data = $this->cloudApiService->wikiSection($params);
-        if (!$data) {
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+    public function recentSearch(Request $request)
+    {
+        $uid = auth('api')->user()->id;
+        $user = $this->userService->getByID($uid);
+        $history = $this->historyService->getRecentSearchHistory($uid);
+
+        if (!$history)
             return response()->json([
-                'success' => false,
-                'message' => 'Can not find information'
+                'success' => false
             ]);
-        }
+        $data = $this->celebService->getBriefInfo($history->celeb_id, $user->lang);
         return response()->json([
             'success' => true,
             'data' => $data

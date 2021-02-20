@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="row">
-    <div class="col-md-6">
+    <div class="show-celeb col-md-12">
         <h3>Registered Celebrities</h3>
         <select class="celeb-list selectpicker" data-live-search="true">
             @foreach ($celebs as $each)
@@ -15,7 +15,7 @@
         <div class="card card-body">
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="add-celeb col-md-12">
         <form action="{{route('cv.store')}}" method="POST" id="createTaskForm">
             @csrf
             <div class="form-group">    
@@ -64,6 +64,12 @@
     .gallery img {
         border-radius: 20px;
     }
+    .celeb-list {
+		margin: 10px 0px;
+	}
+    .show-celeb {
+		display: flow-root;
+	}
 </style>
 
 <script>

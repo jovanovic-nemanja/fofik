@@ -53,7 +53,8 @@ Route::group([
     Route::post('/news', [CelebController::class, 'news']);
     Route::post('/event', [CelebController::class, 'event']);
 
-    Route::post('/descr', [CelebController::class, 'description']);
-
     Route::get('/hint', [CelebController::class, 'recommend']);
+
+    Route::get('/popular', [CelebController::class, 'popular']);
+    Route::get('/recent-search', [CelebController::class, 'recentSearch']);
 });

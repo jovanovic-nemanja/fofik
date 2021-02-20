@@ -5,7 +5,6 @@ namespace App\Services;
 use Closure;
 use DB;
 use App\Models\VisionHistory;
-
 class HistoryService extends BaseService
 {
     public function __construct()
@@ -62,5 +61,24 @@ class HistoryService extends BaseService
         $data['daily'] = $daily;
         $data['monthly'] = $monthly;
         return $data;
+    }
+
+    public function getHRSearchHistory($uid)
+    {
+        return DB::table('ff_search_histories')
+                ->select('celeb_id', DB::raw('count(*) as s_times'))
+                ->where('user_id', $uid)
+                ->groupBy('celeb_id')
+                ->orderBy('s_times', 'DESC')
+                ->offset(0)
+                ->take(5)
+                ->get();
+    }   
+    public function getRecentSearchHistory($uid)
+    {
+        return DB::table('ff_search_histories')
+                ->where('user_id', $uid)
+                ->latest('created_on')
+                ->first();
     }
 }
