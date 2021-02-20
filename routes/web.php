@@ -33,6 +33,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::group(['prefix' => 'cv'], function () {
         Route::get('/', 'CVController@index')->name('cv.index');
         Route::post('/store', 'CVController@store')->name('cv.store');
+        Route::get('/photos', 'CVController@photos')->name('cv.photo');
         //Test recognition
         Route::post('/test', 'CVController@test')->name('cv.test');
     });

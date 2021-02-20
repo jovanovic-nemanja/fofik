@@ -7,22 +7,13 @@
 <div class="row">
     <div class="col-md-6">
         <h3>Registered Celebrities</h3>
-        @foreach ($celebs as $name => $photos)
-		<div class="celebrity">
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="<?='#'.str_replace(' ','-', $name)?>" aria-expanded="false" aria-controls="<?='#'.str_replace(' ','-', $name)?>">{{$name}}</button>
-        <div class="collapse" id="<?=str_replace(' ','-', $name)?>">
-            <div class="card card-body">
-                @foreach ($photos as $photo)
-                <div class="gallery">
-                    <a target="_blank" href="<?='https://dbd.fofik.com/'.$photo?>">
-                        <img src="<?='https://dbd.fofik.com/'.$photo?>" alt="Cinque Terre" width="120px" height="120px">
-                    </a>
-                </div>
-                @endforeach
-            </div>
+        <select class="celeb-list selectpicker" data-live-search="true">
+            @foreach ($celebs as $each)
+                <option value="<?=$each->id?>">{{ $each->name }}</option>
+            @endforeach
+        </select>
+        <div class="card card-body">
         </div>
-		</div>
-        @endforeach
     </div>
     <div class="col-md-6">
         <form action="{{route('cv.store')}}" method="POST" id="createTaskForm">
@@ -70,6 +61,9 @@
         width: 120px;
         border-radius: 20px;
     }
+    .gallery img {
+        border-radius: 20px;
+    }
 </style>
 
 <script>
@@ -108,6 +102,51 @@
                 alert("Please select image files");
         })
 
+        function drawPhotoBoard(photos)
+        {   
+            $('.card').empty();
+            for (var i = 0; i < photos.length; i++) {
+                let photo = photos[i];
+                let imgLink = 'https://dbd.fofik.com/' + photo;
+                let gallery = document.createElement('div');
+                let linkTag = document.createElement('a');
+                let imgTag = document.createElement('img');
+
+                gallery.setAttribute('class', 'gallery');
+                linkTag.setAttribute('target', '_blank');
+                linkTag.setAttribute('href', imgLink);
+                imgTag.setAttribute('src', imgLink);
+                imgTag.setAttribute('width', '120px');
+                imgTag.setAttribute('height', '120px');
+                linkTag.appendChild(imgTag);
+                gallery.appendChild(linkTag);
+                $('.card').append(gallery);
+            }
+        }
+        function emptyPhotoBoard()
+        {
+            $('.card').empty();
+            let empText = "There are no photos";
+            $('.card').append(empText);
+        }
+        $('.celeb-list').change(function () {
+            let id = $(this).val();
+            $.ajax({
+                url: 'cv/photos',
+                type: 'get',
+                data: {
+                    id: id
+                },
+                success: function (result) {
+                    if (result.success) {
+                        drawPhotoBoard(result.photos);
+                    } else {
+                        emptyPhotoBoard();
+                    }
+                }
+            })
+        })
+        $('.celeb-list').val(1).change();
         // Test recognition
         $('.recognize').click(function () {
             var formData = new FormData();

@@ -22,7 +22,8 @@ class CVController extends Controller
     }
     public function index()
     {
-        $list = $this->openCVService->getAllRecords();
+        // $list = $this->openCVService->getAllRecords();
+        $list = $this->openCVService->getCVResource();
         return view('cv.index')
                 ->with('celebs', $list);
     }
@@ -61,7 +62,19 @@ class CVController extends Controller
             'success' => true
         ]);
     }
-
+    public function photos(Request $request)
+    {
+        $params = $request->all();
+        if (!isset($params['id']))
+            return response()->json([
+                'success' => false
+            ]);
+        $photos = $this->openCVService->getCVPhotos($params['id']);
+        return response()->json([
+            'success' => true,
+            'photos' => $photos
+        ]);
+    }
     // Test recognition
     public function test(Request $request)
     {

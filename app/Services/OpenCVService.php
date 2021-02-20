@@ -97,4 +97,18 @@ class OpenCVService extends BaseService
         }
         return $data;
     }
+    public function getCVResource()
+    {
+        return CVResource::all();
+    }
+    public function getCVPhotos($id)
+    {
+        $records = CVPhoto::where(['cv_id' => $id])->get();
+        $photos = [];
+        foreach ($records as $item)
+        {
+            $photos[] = $item->photo;
+        }
+        return $photos;
+    }
 }
