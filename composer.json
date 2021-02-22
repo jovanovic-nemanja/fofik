@@ -39,6 +39,7 @@
         "ramsey/uuid": "^3.6",
         "spatie/flysystem-dropbox": "^1.0",
         "tymon/jwt-auth": "^1.0",
+        "voku/simple_html_dom": "^4.7",
         "yajra/laravel-datatables-oracle": "~9.0"
     },
     "require-dev": {

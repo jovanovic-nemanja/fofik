@@ -5,47 +5,87 @@
 
 @section('content')
 <div class="row">
-    <div class="show-celeb col-md-12">
-        <h3>Registered Celebrities</h3>
-        <select class="celeb-list selectpicker" data-live-search="true">
-            @foreach ($celebs as $each)
-                <option value="<?=$each->id?>">{{ $each->name }}</option>
-            @endforeach
-        </select>
-        <div class="card card-body">
+    <div class="card">
+        <div class="card-header">
+            <a class="btn btn-primary card-link" data-toggle="collapse" href="#collapseOne">
+                <h4>Registered Celebrities</h4>
+            </a>
         </div>
-    </div>
-    <div class="add-celeb col-md-12">
-        <form action="{{route('cv.store')}}" method="POST" id="createTaskForm">
-            @csrf
-            <div class="form-group">    
-                <h3>Add New</h3>
-                <input type="text" class="form-control" name="name" placeholder="Type celebrity name here" />
-            </div>
-            <div class="form-group">
-                <div class="tablet">
-                    <div class="tablet__body">
-                            <label class="control-label">
-                                <h3>Drop files here or click to upload</h3>
-                            </label>
-                            <div class="dropzone dz-default dz-message" id="dropzone-images">
-                            </div>
-                    </div>
+        <div id="collapseOne" class="collapse show-celeb">
+            <div class="card-body">
+                <select class="celeb-list selectpicker" data-live-search="true">
+                    @foreach ($celebs as $each)
+                        <option value="<?=$each->id?>">{{ $each->name }}</option>
+                    @endforeach
+                </select>
+                <div class="photo-board">
                 </div>
             </div>
-            <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Upload" />
-            </div>
-        </form>
-
-        <!-- Test recognition -->
-        <div class="test-box" style="margin-top: 60px;">
-        <h3>Test Box</h3>
-        <input type="file" class="test-img" name="test-img" accept="image/*">
-
-        <button class="recognize btn btn-primary" style="margin-top:20px">Test</button>
         </div>
     </div>
+    <div class="card">
+        <div class="card-header">
+            <a class="btn btn-primary collapsed card-link" data-toggle="collapse" href="#collapseTwo">
+                <h4>Add New</h4>
+            </a>
+        </div>
+        <div id="collapseTwo" class="collapse add-celeb">
+            <div class="card-body">
+                <form action="{{route('cv.store')}}" method="POST" id="uploadCVPhotos">
+                    @csrf
+                    <div class="form-group d-flex">    
+                        <input type="text" class="form-control" name="name" placeholder="Type celebrity name here" />
+                        <input type="submit" class="btn btn-primary" value="Upload" />
+                    </div>
+                    <div class="form-group">
+                        <div class="tablet">
+                            <div class="tablet__body">
+                                    <label class="control-label">
+                                        <h3>Drop files here or click to upload</h3>
+                                    </label>
+                                    <div class="dropzone dz-default dz-message" id="dropzone-images">
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <a class="btn btn-primary collapsed card-link" data-toggle="collapse" href="#collapseFour">
+                <h4>Download Photos</h4>
+            </a>
+        </div>
+        <div id="collapseFour" class="collapse download-photos">
+            <div class="card-body">
+                <form action="{{route('cv.google.photo')}}" method="POST">
+                    <div class="form-group d-flex">
+                        <input type="text" class="form-control" name="name" placeholder="Type celebrity name here">
+                        <input type="submit" class="btn btn-primary" value="Download">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <a class="btn btn-primary collapsed card-link" data-toggle="collapse" href="#collapseThree">
+                <h4>Test Box</h4>
+            </a>
+        </div>
+        <div id="collapseThree" class="collapse test-box">
+            <div class="card-body">
+                <!-- Test recognition -->
+                <div class="test-box d-flex">
+                    <input type="file" class="test-img" name="test-img" accept="image/*">
+                    <button class="recognize btn btn-primary">Test</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </div>
 @stop
 
@@ -67,15 +107,25 @@
     .celeb-list {
 		margin: 10px 0px;
 	}
-    .show-celeb {
-		display: flow-root;
-	}
+    .card {
+        margin: 10px 30px;
+    }
+    .card-header a {
+        display: flow-root;
+        padding: 15px 20px;
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .card-body .d-flex {
+        display: flex;
+    }
 </style>
 
 <script>
     Dropzone.autoDiscover = false;
     $(function () {
-        var myDropzone = new Dropzone("#createTaskForm", {
+        var myDropzone = new Dropzone("#uploadCVPhotos", {
             autoProcessQueue: false,
             uploadMultiple: true,
             parallelUploads: 10,
@@ -100,7 +150,7 @@
             $('input[type="submit"]').attr("disabled", false);
         });
 
-        $('input[type=submit]').click(function (e) {
+        $('#uploadCVPhotos input[type=submit]').click(function (e) {
             e.preventDefault();
             if (myDropzone.getQueuedFiles().length > 0)
                 myDropzone.processQueue();
@@ -110,7 +160,7 @@
 
         function drawPhotoBoard(photos)
         {   
-            $('.card').empty();
+            $('.photo-board').empty();
             for (var i = 0; i < photos.length; i++) {
                 let photo = photos[i];
                 let imgLink = 'https://dbd.fofik.com/' + photo;
@@ -126,14 +176,14 @@
                 imgTag.setAttribute('height', '120px');
                 linkTag.appendChild(imgTag);
                 gallery.appendChild(linkTag);
-                $('.card').append(gallery);
+                $('.photo-board').append(gallery);
             }
         }
         function emptyPhotoBoard()
         {
-            $('.card').empty();
+            $('.photo-board').empty();
             let empText = "There are no photos";
-            $('.card').append(empText);
+            $('.photo-board').append(empText);
         }
         $('.celeb-list').change(function () {
             let id = $(this).val();

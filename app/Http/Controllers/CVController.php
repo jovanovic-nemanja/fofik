@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use ZipArchive;
+use voku\helper\HtmlDomParser;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -74,6 +77,35 @@ class CVController extends Controller
             'success' => true,
             'photos' => $photos
         ]);
+    }
+    public function googlePhotos(Request $request)
+    {
+        $params = $request->all();
+        if (!isset($params['name'])) {
+            echo "Please select celebrity name"; die();
+        }
+        $search_query = urlencode(trim($params['name']));
+        $html = HtmlDomParser::file_get_html('http://images.google.com/images?as_q='. $search_query .'&hl=en&imgtbs=z&btnG=Search+Images&as_epq=&as_oq=&as_eq=&imgtype=&imgsz=m&imgw=&imgh=&imgar=&as_filetype=&imgc=&as_sitesearch=&as_rights=&safe=images&as_st=y'); 
+        $images = $html->find('div>img');
+
+        $tmpFile = 'images/file.zip';
+
+        $zip = new ZipArchive;
+        $zip->open($tmpFile, ZipArchive::CREATE);
+        foreach ($images as $key => $image) {
+            // download file
+            $srcimg = $image->src;
+            $fileContent = file_get_contents($srcimg);
+            $zip->addFromString($key.'.jpg', $fileContent);
+        }
+        $zip->close();
+
+        header('Content-Type: application/zip');
+        header('Content-disposition: attachment; filename=file.zip');
+        header('Content-Length: ' . filesize($tmpFile));
+        readfile($tmpFile);
+
+        unlink($tmpFile);
     }
     // Test recognition
     public function test(Request $request)

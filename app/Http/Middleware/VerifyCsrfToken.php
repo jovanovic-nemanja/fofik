@@ -13,6 +13,7 @@ class VerifyCsrfToken extends BaseVerifier
      */
     protected $except = [
         'notifications/markread',
-        'cv/test'
+        'cv/test',
+        'cv/download-photos'
     ];
 }
