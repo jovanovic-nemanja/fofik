@@ -264,6 +264,7 @@ class CelebController extends Controller
             $detail->celeb_id = $celebrity->id;
             $detail->en_name = @$wiki['en_name'] ? $wiki['en_name'] : '';
             $detail->natl_name = @$wiki['natl_name'] ? $wiki['natl_name'] : '';
+            $detail->comment = @$wiki['comment'] ? $wiki['comment'] : '';
             $detail->born_in = @$wiki['born_in'] ? $wiki['born_in'] : '';
             $detail->citizen_ship = @$wiki['citizen_ship'] ? implode('&', $wiki['citizen_ship']) : '';
             $detail->spouse = @$wiki['spouse'] ? implode('&', array_map(function($item){return implode('|', $item);}, $wiki['spouse'])) : '';

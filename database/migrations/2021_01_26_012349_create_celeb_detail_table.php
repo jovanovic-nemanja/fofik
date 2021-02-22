@@ -18,6 +18,7 @@ class CreateCelebDetailTable extends Migration
             $table->unsignedBigInteger('celeb_id');
             $table->string('en_name')->nullable();
             $table->string('natl_name')->nullable();
+            $table->string('comment')->nullable();
             $table->string('born_in')->nullable();
             $table->string('citizen_ship')->nullable();
             $table->string('spouse')->nullable();

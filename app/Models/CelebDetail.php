@@ -23,6 +23,7 @@ class CelebDetail extends Model
         'celeb_id',
         'en_name',
         'natl_name',
+        'comment',
         'born_in',
         'citizen_ship',
         'spouse',

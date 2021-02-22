@@ -50,7 +50,7 @@ class CelebService extends BaseService
     {
         $model = DB::table('ff_celebs as A')
             ->join('ff_celeb_detail as B', 'A.id', '=', 'B.celeb_id')
-            ->select('A.*', 'B.en_name', 'B.natl_name', 'B.born_in', 'B.citizen_ship', 'B.spouse', 'B.children', 'B.education', 'B.occupation', 'B.net_worth', 'B.description', 'B.lang')
+            ->select('A.*', 'B.en_name', 'B.natl_name', 'B.comment', 'B.born_in', 'B.citizen_ship', 'B.spouse', 'B.children', 'B.education', 'B.occupation', 'B.net_worth', 'B.description', 'B.lang')
             ->where('B.lang', '=', $lang)
             ->where('B.celeb_id', '=', $id)
             ->first();
@@ -67,7 +67,7 @@ class CelebService extends BaseService
     {
         $model = DB::table('ff_celebs as A')
             ->join('ff_celeb_detail as B', 'A.id', '=', 'B.celeb_id')
-            ->select('A.external_id', 'A.photo_url', 'B.natl_name')
+            ->select('A.external_id', 'A.photo_url', 'A.facebook', 'A.instagram', 'A.twitter', 'B.natl_name', 'B.comment')
             ->where('B.lang', '=', $lang)
             ->where('B.celeb_id', '=', $id)
             ->first();

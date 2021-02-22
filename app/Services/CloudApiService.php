@@ -226,7 +226,7 @@ class CloudApiService extends BaseService
         $data['external_id'] = $wikidata->title;
         $data['en_name'] = $wikidata->labels->{'en'}->value;
         $data['natl_name'] = $wikidata->labels->{$lang}->value;
-        $data['description'] = $wikidata->descriptions->{$lang}->value;
+        $data['comment'] = $wikidata->descriptions->{$lang}->value;
 
         $p_image = 'P18';
         $p_citizenship = 'P27';
