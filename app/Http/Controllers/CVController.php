@@ -12,16 +12,18 @@ use App\Models\CVResource;
 use App\Models\CVPhoto;
 use App\Services\PhotoUploadService;
 use App\Services\OpenCVService;
-
+use App\Services\CloudApiService;
 class CVController extends Controller
 {
     protected $photoUploadService;
     protected $openCVService;
+    protected $cloudApiService;
     //
-    public function __construct(PhotoUploadService $photoUploadService, OpenCVService $openCVService)
+    public function __construct(PhotoUploadService $photoUploadService, OpenCVService $openCVService, CloudApiService $cloudApiService)
     {
         $this->photoUploadService = $photoUploadService;
         $this->openCVService = $openCVService;
+        $this->cloudApiService = $cloudApiService;
     }
     public function index()
     {
@@ -84,19 +86,40 @@ class CVController extends Controller
         if (!isset($params['name'])) {
             echo "Please select celebrity name"; die();
         }
-        $search_query = urlencode(trim($params['name']));
-        $html = HtmlDomParser::file_get_html('http://images.google.com/images?as_q='. $search_query .'&hl=en&imgtbs=z&btnG=Search+Images&as_epq=&as_oq=&as_eq=&imgtype=&imgsz=m&imgw=&imgh=&imgar=&as_filetype=&imgc=&as_sitesearch=&as_rights=&safe=images&as_st=y'); 
-        $images = $html->find('div>img');
-
         $tmpFile = 'images/file.zip';
 
         $zip = new ZipArchive;
         $zip->open($tmpFile, ZipArchive::CREATE);
-        foreach ($images as $key => $image) {
-            // download file
-            $srcimg = $image->src;
-            $fileContent = file_get_contents($srcimg);
-            $zip->addFromString($key.'.jpg', $fileContent);
+        // $html = HtmlDomParser::file_get_html('http://images.google.com/images?as_q='. $search_query .'&hl=en&imgtbs=z&btnG=Search+Images&as_epq=&as_oq=&as_eq=&imgtype=&imgsz=l&imgw=&imgh=&imgar=&as_filetype=&imgc=&as_sitesearch=&as_rights=&safe=images&as_st=y'); 
+		//$html = HtmlDomParser::file_get_html('https://www.google.com/search?q=Tom%20Hanks&tbm=isch');
+        
+        $images = $this->cloudApiService->bingImages($params);
+        $image_count = 0;
+        foreach ($images as $key => $image)
+        {
+            $fileContent = file_get_contents($image);
+            $randname = $key.'.png';
+            $randname = 'images/'.$randname;
+            file_put_contents($randname, $fileContent);
+            $im = imagecreatefromstring($fileContent);
+            $faces = $this->openCVService->detectFaces($randname);
+            if (count($faces) > 0)
+                $image_count++;
+            if ($image_count > 30)
+                break;
+            foreach ($faces as $face)
+            {
+                $randname = uniqid();
+                $randname .= '.png';
+                $crop = imagecrop($im, (array)$face);
+                ob_start();
+                imagepng($crop);
+                $contents = ob_get_contents();
+                ob_end_clean();
+                imagedestroy($crop);
+                $zip->addFromString($randname, $contents);
+                // imagepng($crop, $randname); 
+            }
         }
         $zip->close();
 

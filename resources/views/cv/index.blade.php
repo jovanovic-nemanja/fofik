@@ -104,6 +104,9 @@
     .gallery img {
         border-radius: 20px;
     }
+    .show-celeb .card-body {
+        display: flow-root;
+    }
     .celeb-list {
 		margin: 10px 0px;
 	}
@@ -122,7 +125,7 @@
     }
 </style>
 
-<script>
+<script type="text/javascript">
     Dropzone.autoDiscover = false;
     $(function () {
         var myDropzone = new Dropzone("#uploadCVPhotos", {

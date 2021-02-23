@@ -407,6 +407,31 @@ class CloudApiService extends BaseService
         }
         return $data;
     }
+    public function bingImages($params)
+    {
+        $name = @$params['name'];
+        if (!$name)
+            return [];
+        $url = 'https://api.bing.microsoft.com/v7.0/images/search?';
+        $payload = array (
+            'q' => str_replace(' ',  '%20', $name),
+            'count' => 50,
+            'imageType' => 'Photo',
+            'size' => 'medium',
+            'imageContent' => 'Face'
+        );
+        $apikey = '165205352171421bbaecc8e9dc49cc7d';
+        $header = array(
+            'Ocp-Apim-Subscription-Key:'.$apikey
+        );
+        $data = [];
+        $res = $this->api($url, $payload, $header);
+        foreach ($res->value as $image)
+        {
+            $data[] = $image->contentUrl;
+        }
+        return $data;
+    }
     public function bingEntities($keyword)
     {
         $url = 'https://api.bing.microsoft.com/v7.0/entities?';

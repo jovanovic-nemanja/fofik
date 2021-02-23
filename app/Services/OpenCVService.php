@@ -21,7 +21,7 @@ class OpenCVService extends BaseService
     }
     public function recognize($photo)
     {
-        $faceClassifier = $this->getClassifier();
+        $faceClassifier = $this->getClassifier('lbp');
         $faceRecognizer = $this->getModel();
 
         if (!$this->bTrained)
@@ -53,15 +53,18 @@ class OpenCVService extends BaseService
         }
         return $faceRecognizer;
     }
-    public function getClassifier()
+    public function getClassifier($type)
     {
         $faceClassifier = new CascadeClassifier();
-        $faceClassifier->load(public_path('opencv/models/lbpcascades/lbpcascade_frontalface_improved.xml'));
+		if ($type == 'lbp')
+        	$faceClassifier->load(public_path('opencv/models/lbpcascades/lbpcascade_frontalface_improved.xml'));
+		else if ($type == 'haar')
+			$faceClassifier->load(public_path('opencv/models/haarcascades/haarcascade_frontalface_alt_tree.xml'));
         return $faceClassifier;
     }
     public function updateModel($photos, $label)
     {
-        $faceClassifier = $this->getClassifier();
+        $faceClassifier = $this->getClassifier('lbp');
         $faceRecognizer = $this->getModel();
         $faceImages = $faceLabels = [];
         foreach ($photos as $photo)
@@ -81,7 +84,14 @@ class OpenCVService extends BaseService
             $faceRecognizer->update($faceImages, $faceLabels);
         $faceRecognizer->write(public_path('opencv/celeb_recognize_model.xml'));
     }
-
+	public function detectFaces($photo)
+    {
+        $faceClassifier = $this->getClassifier('haar');
+        $src = imread(public_path($photo));
+        $gray = cvtColor($src, COLOR_BGR2GRAY);
+        $faceClassifier->detectMultiScale($gray, $faces);       
+        return $faces;
+    }
     public function getAllRecords()
     {
         $records = CVResource::all();
