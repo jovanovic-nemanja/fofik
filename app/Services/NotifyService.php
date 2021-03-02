@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\LoginLog;
 use App\Models\User;
-use App\Models\Notify;
+
+use Mail;
 
 class NotifyService extends BaseService
 {
@@ -15,7 +15,7 @@ class NotifyService extends BaseService
         $this->userService = $userService;
 	}
     
-    public function send($notify, $id = null)
+    public function pushNotify($data, $id = null)
     {
         $now = date('Y-m-d H:i:s');
         if ($id)
@@ -28,12 +28,10 @@ class NotifyService extends BaseService
         $data = [
             "registration_ids" => $firebaseToken,
             "notification" => [
-                "title" => $notify['title'],
-                "body" => $notify['body'],  
-                "icon" => $notify['icon'],
+                "title" => $data['title'],
+                "body" => $data['content'],
             ],
             "data" => [
-                "link" => $notify['link'],
                 "pushed_at" => $now
             ]
         ];
@@ -54,7 +52,23 @@ class NotifyService extends BaseService
         curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
                
         $response = curl_exec($ch);
-
-        
+    }
+    public function sendEmail($data, $id = null)
+    {
+        if ($id)
+            $mails = User::where(['id' => $id])->pluck('email')->all();
+        else
+            $mails = User::whereNotNull('email')->pluck('email')->all();
+        foreach ($mails as $mail)
+        {
+            \Mail::send('email.test', array(
+                'subject' => $data['title'],
+                'email' => $mail,
+                'body' => $data['content'],
+            ), function($message) use ($data){
+                $message->from('burcuhan@gmail.com');
+                $message->to($mail, 'Admin')->subject($data['title']);
+            });
+        }
     }
 }

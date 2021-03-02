@@ -14,6 +14,7 @@ class VerifyCsrfToken extends BaseVerifier
     protected $except = [
         'notifications/markread',
         'cv/test',
-        'cv/download-photos'
+        'cv/download-photos',
+        'message/send'
     ];
 }

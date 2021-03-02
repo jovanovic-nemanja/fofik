@@ -38,7 +38,13 @@ Route::group(['middleware' => ['auth']], function () {
         //Test recognition
         Route::post('/test', 'CVController@test')->name('cv.test');
     });
-
+    /**
+     * Message
+     */
+    Route::group(['prefix' => 'message'], function () {
+        Route::get('/', 'MessageController@index')->name('msg.index');
+        Route::post('/send', 'MessageController@send')->name('msg.send');
+    });
     Route::resource('users', 'UsersController');
 });
 
