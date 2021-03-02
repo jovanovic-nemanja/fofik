@@ -97,29 +97,35 @@ class CVController extends Controller
         $image_count = 0;
         foreach ($images as $key => $image)
         {
-            $fileContent = file_get_contents($image);
-            $randname = $key.'.png';
-            $randname = 'images/'.$randname;
-            file_put_contents($randname, $fileContent);
-            $im = imagecreatefromstring($fileContent);
-            $faces = $this->openCVService->detectFaces($randname);
-            if (count($faces) > 0)
-                $image_count++;
-            if ($image_count > 30)
-                break;
-            foreach ($faces as $face)
-            {
-                $randname = uniqid();
-                $randname .= '.png';
-                $crop = imagecrop($im, (array)$face);
-                ob_start();
-                imagepng($crop);
-                $contents = ob_get_contents();
-                ob_end_clean();
-                imagedestroy($crop);
-                $zip->addFromString($randname, $contents);
-                // imagepng($crop, $randname); 
-            }
+            $fileContent = @file_get_contents($image);
+			if ($fileContent !== false)
+			{
+				$fileContent = base64_decode(base64_encode($fileContent));
+				
+				//print_r($fileContent);exit;
+				$randname = $key.'.png';
+				$randname = 'images/'.$randname;
+				file_put_contents($randname, $fileContent);
+				$im = imagecreatefromstring($fileContent);
+				$faces = $this->openCVService->detectFaces($randname);
+				if (count($faces) > 0)
+					$image_count++;
+				if ($image_count > 20)
+					break;
+				foreach ($faces as $face)
+				{
+					$randname = uniqid();
+					$randname .= '.png';
+					$crop = imagecrop($im, (array)$face);
+					ob_start();
+					imagepng($crop);
+					$contents = ob_get_contents();
+					ob_end_clean();
+					imagedestroy($crop);
+					$zip->addFromString($randname, $contents);
+					// imagepng($crop, $randname); 
+				}
+			}
         }
         $zip->close();
 

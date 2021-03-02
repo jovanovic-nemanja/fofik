@@ -87,10 +87,14 @@ class OpenCVService extends BaseService
 	public function detectFaces($photo)
     {
         $faceClassifier = $this->getClassifier('haar');
-        $src = imread(public_path($photo));
-        $gray = cvtColor($src, COLOR_BGR2GRAY);
-        $faceClassifier->detectMultiScale($gray, $faces);       
-        return $faces;
+		try {
+        	$src = imread(public_path($photo));
+			$gray = cvtColor($src, COLOR_BGR2GRAY);
+			$faceClassifier->detectMultiScale($gray, $faces);       
+			return $faces;
+		} catch (\Exception $e) {
+			return [];
+		}
     }
     public function getAllRecords()
     {

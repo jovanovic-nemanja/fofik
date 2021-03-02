@@ -415,7 +415,7 @@ class CloudApiService extends BaseService
         $url = 'https://api.bing.microsoft.com/v7.0/images/search?';
         $payload = array (
             'q' => str_replace(' ',  '%20', $name),
-            'count' => 50,
+            'count' => 80,
             'imageType' => 'Photo',
             'size' => 'medium',
             'imageContent' => 'Face'

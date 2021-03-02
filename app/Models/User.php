@@ -34,7 +34,8 @@ class User extends Authenticatable implements JWTSubject
         'lang',
         'platform',
         'device_id',
-        'device_token',
+        'fb_token',
+        'access_token'
     ];
 
     /**

@@ -247,9 +247,12 @@ class JwtAuthController extends Controller
         ]);
     }
 
-    public function saveDeviceToken(Request $request) 
+    public function firebaseToken(Request $request) 
     {
-        auth('api')->user()->update(['device_token' => $request->token]);
-        return response()->json('token saved successfully');
+        auth('api')->user()->update(['fb_token' => $request->token]);
+        return response()->json([
+            'success' => true,
+            'message' => 'token saved successfully'
+        ]);
     }
 }

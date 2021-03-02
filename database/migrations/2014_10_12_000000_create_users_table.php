@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->string('lang');
             $table->string('platform');
             $table->string('device_id');
+            $table->string('fb_token');
             $table->text('access_token');
             $table->rememberToken();
             $table->timestamps();

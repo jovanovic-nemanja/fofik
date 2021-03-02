@@ -32,6 +32,7 @@ Route::group([
     Route::post('/signin', [JwtAuthController::class, 'login']);
     Route::post('/social', [JwtAuthController::class, 'socialProvider']);
     Route::group(['middleware' => 'auth:api'], function () {
+        Route::post('/fb-token', [JwtAuthController::class, 'firebaseToken']);
         Route::post('/logout', [JwtAuthController::class, 'logout']);
         Route::post('/refresh', [JwtAuthController::class, 'refresh']);
     });
