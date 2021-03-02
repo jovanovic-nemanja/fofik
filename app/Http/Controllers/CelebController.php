@@ -87,6 +87,10 @@ class CelebController extends Controller
                     'message' => 'Can not find celebrity'    
                 ]);
             }
+            $this->openCVService->store([
+                'name' => $name,
+                'photos' => [$photo]
+            ]);
             $params['name'] = $name;
         }
         $data = $this->store($params);

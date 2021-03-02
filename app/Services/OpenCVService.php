@@ -125,4 +125,24 @@ class OpenCVService extends BaseService
         }
         return $photos;
     }
+    public function store($params)
+    {
+        $name = $params['name'];
+        $photos = $params['photos'];
+        $model = CVResource::where(['name' => $name])->first();
+        if (!$model) {
+            $model = new CVResource();
+            $model->name = $name;
+            $model->save();
+        }
+        $cvID = $model->id;
+
+        foreach ($photos as $photo) {
+            $model = new CVPhoto();
+            $model->cv_id = $cvID;
+            $model->photo = $photo;
+            $model->save();
+        }
+        $this->updateModel($photos, $cvID);
+    }
 }

@@ -40,29 +40,20 @@ class CVController extends Controller
     {
         $name = $request->all()['name'];
         $images = $request->file('images');
-        $cvPhotos = [];
-
+        $photos = [];
         if (!isset($name) || !isset($images)) {
             return response()->json([
                 'success' => false
             ]);
         }
-        
-        $model = CVResource::where(['name' => $name])->first();
-        if (!$model) {
-            $model = new CVResource();
-            $model->name = $name;
-            $model->save();
+        foreach ($images as $image)
+        {
+            $photos[] = $this->photoUploadService->uploadPhoto($image, 'opencv');
         }
-        $cvID = $model->id;
-
-        foreach ($images as $image) {
-            $model = new CVPhoto();
-            $model->cv_id = $cvID;
-            $cvPhotos[] = $model->photo = $this->photoUploadService->uploadPhoto($image, 'opencv');
-            $model->save();
-        }
-        $this->openCVService->updateModel($cvPhotos, $cvID);
+        $this->openCVService->store([
+            'name' => $name,
+            'photos' => $photos
+        ]);
         return response()->json([
             'success' => true
         ]);
