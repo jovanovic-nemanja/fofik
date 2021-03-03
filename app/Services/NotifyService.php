@@ -61,14 +61,18 @@ class NotifyService extends BaseService
             $mails = User::whereNotNull('email')->pluck('email')->all();
         foreach ($mails as $mail)
         {
-            \Mail::send('email.test', array(
+            // \Mail::send('email.test', array(
+            //     'subject' => $data['title'],
+            //     'body' => $data['content'],
+            // ), function($message) use ($data){
+            //     $message->from('burcuhan@gmail.com', 'Fofik');
+            //     $message->to('jovanovic.nemanja.1029@gmail.com', 'Admin')->subject($data['title']);
+            // });
+            $details = array (
                 'subject' => $data['title'],
-                'email' => $mail,
-                'body' => $data['content'],
-            ), function($message) use ($data){
-                $message->from('burcuhan@gmail.com');
-                $message->to($mail, 'Admin')->subject($data['title']);
-            });
+                'body' => $data['content']
+            );
+            Mail::to('jovanovic.nemanja.1029@gmail.com')->send(new \App\Mail\FofikMail($details));
         }
     }
 }
