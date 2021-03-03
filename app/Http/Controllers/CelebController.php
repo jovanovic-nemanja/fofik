@@ -208,7 +208,14 @@ class CelebController extends Controller
             'data' => $news
         ]);
     }
-
+    public function birthday(Request $request)
+    {
+        $celebs = $this->cloudApiService->rapidBirth();
+        return response()->json([
+            'success' => true,
+            'data' => $celebs
+        ]);
+    }
     public function popular(Request $request)
     {
         $uid = auth('api')->user()->id;

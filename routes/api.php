@@ -55,7 +55,7 @@ Route::group([
     Route::post('/event', [CelebController::class, 'event']);
 
     Route::get('/hint', [CelebController::class, 'recommend']);
-
+    Route::get('/birthday', [CelebController::class, 'birthday']);
     Route::get('/popular', [CelebController::class, 'popular']);
     Route::get('/recent-search', [CelebController::class, 'recentSearch']);
 });

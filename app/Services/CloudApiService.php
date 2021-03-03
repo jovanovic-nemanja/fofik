@@ -490,6 +490,22 @@ class CloudApiService extends BaseService
         }
         return $data;
     }
+    public function rapidBirth()
+    {
+        $url = 'https://celebrity-bucks.p.rapidapi.com/birthdays/JSON';
+        $header = array (
+            "x-rapidapi-key: 84ebadb67fmsh942141f601f4f73p13b353jsn74ce2c9cd19c",
+            "x-rapidapi-host: celebrity-bucks.p.rapidapi.com",
+            "useQueryString: true"
+        );
+        $res = $this->api($url, [], $header);
+        $data = [];
+        foreach ($res->Birthdays as $item)
+        {
+            $data[] = $item->name;
+        }
+        return $data;
+    }
     public function api($url, $payload, $header = null)
     {
         foreach ($payload as $key => $value) {
