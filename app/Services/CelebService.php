@@ -6,13 +6,13 @@ use Closure;
 use DB;
 use App\Models\Celebrity;
 use App\Models\CelebDetail;
+use App\Models\AutoComplete;
 
 class CelebService extends BaseService
 {
     public function __construct()
     {
     }
-
     public function getModel($params)
     {   
         return Celebrity::where($params)->first();
@@ -75,9 +75,8 @@ class CelebService extends BaseService
     }
     public function getRecommendations($keyword, $lang)
     {
-        return CelebDetail::select('natl_name as name')->where([
-            ['natl_name', 'LIKE', '%'.$keyword.'%'],
-            ['lang', '=', $lang]
+        return AutoComplete::select('celeb_name as name')->where([
+            ['celeb_name', 'LIKE', '%'.$keyword.'%']
         ])->get();
     }
 

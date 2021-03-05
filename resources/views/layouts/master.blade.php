@@ -56,21 +56,20 @@
                 class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('CV Panel') }} </span></a>
             <a href="{{route('msg.index')}}" class=" list-group-item" data-parent="#MainMenu"><i
                 class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('Message Panel') }} </span></a>
+            <a href="{{route('doc.index')}}" class=" list-group-item" data-parent="#MainMenu"><i
+                class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('AC Panel') }} </span></a>
             <a href="#user" class=" list-group-item" data-toggle="collapse" data-parent="#MainMenu"><i
                         class="fa fa-users sidebar-icon"></i><span id="menu-txt">{{ __('Users') }}</span>
                 <i class="icon ion-md-arrow-dropup arrow-side sidebar-arrow"></i></a>
             <div class="collapse" id="user">
                 <a href="{{ route('users.index')}}" class="list-group-item childlist"> <i
                             class="bullet-point"><span></span></i> {{ __('All Users') }}</a>
-             
                 <a href="{{ route('users.create')}}"
                     class="list-group-item childlist"> <i class="bullet-point"><span></span></i> {{ __('New User') }}
                 </a>
             </div>
         </div>
     </nav>
-
-
     <!-- Page Content -->
     <div id="page-content-wrapper">
         <div class="container-fluid">

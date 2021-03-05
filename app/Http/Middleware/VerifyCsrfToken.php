@@ -15,6 +15,7 @@ class VerifyCsrfToken extends BaseVerifier
         'notifications/markread',
         'cv/test',
         'cv/download-photos',
-        'message/send'
+        'message/send',
+        'document/names'
     ];
 }

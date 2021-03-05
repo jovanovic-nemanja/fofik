@@ -11,6 +11,7 @@ use App\Services\CloudApiService;
 use App\Services\OpenCVService;
 use App\Services\CVDNNService;
 use App\Services\HistoryService;
+use App\Services\DocumentService;
 
 use App\Models\Celebrity;
 use App\Models\CelebDetail;
@@ -26,7 +27,7 @@ class CelebController extends Controller
     protected $openCVService;
     protected $cvDNNService;
 
-    public function __construct(UserService $userService, CelebService $celebService, PhotoUploadService $photoUploadService, CloudApiService $cloudApiService, OpenCVService $openCVService, CVDNNService $cvDNNService, HistoryService $historyService) 
+    public function __construct(UserService $userService, CelebService $celebService, PhotoUploadService $photoUploadService, CloudApiService $cloudApiService, OpenCVService $openCVService, CVDNNService $cvDNNService, HistoryService $historyService, DocumentService $documentService) 
     {
         $this->userService = $userService;
         $this->celebService = $celebService;
@@ -35,6 +36,7 @@ class CelebController extends Controller
         $this->openCVService = $openCVService;
         $this->cvDNNService = $cvDNNService;
         $this->historyService = $historyService;
+        $this->documentService = $documentService;
     }
     
     /**
@@ -293,7 +295,8 @@ class CelebController extends Controller
         $user->histories()->attach($celebrity, ['created_on' => Date('Y-m-d')]);
 
         $data = $this->celebService->getDetailInfo($celebrity->id, $lang);
-
+        $this->documentService->store($data->natl_name);
+        
         $data->favorite = $user->hasInFavList($celebrity->id);
         // $data['video'] = $this->cloudApiService->youtube($params); 
         // $data['movie'] = $this->cloudApiService->imdb($params);

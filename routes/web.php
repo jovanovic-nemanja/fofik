@@ -27,6 +27,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/data', 'UsersController@anyData')->name('users.data');
         Route::get('/users', 'UsersController@users')->name('users.users');
     });
+    Route::group(['prefix' => 'document'], function () {
+        Route::get('/', 'DocumentController@index')->name('doc.index');
+        Route::post('names', 'DocumentController@celebNames')->name('doc.celeb.names');
+    });
     /**
      * OpenCV
      */
