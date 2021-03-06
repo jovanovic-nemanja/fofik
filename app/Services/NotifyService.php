@@ -62,20 +62,25 @@ class NotifyService extends BaseService
             $mails = User::where(['id' => $id])->pluck('email')->all();
         else
             $mails = User::whereNotNull('email')->pluck('email')->all();
-        foreach ($mails as $mail)
-        {
-            // \Mail::send('email.test', array(
-            //     'subject' => $data['title'],
-            //     'body' => $data['content'],
-            // ), function($message) use ($data){
-            //     $message->from('burcuhan@gmail.com', 'Fofik');
-            //     $message->to('jovanovic.nemanja.1029@gmail.com', 'Admin')->subject($data['title']);
-            // }); 
-            $details = array (
-                'subject' => $data['title'],
-                'body' => $data['content']
-            );
-            Mail::to('jovanovic.nemanja.1029@gmail.com')->send(new \App\Mail\FofikMail($details));
-        }
+        // foreach ($mails as $mail)
+        // {
+        //     // \Mail::send('email.test', array(
+        //     //     'subject' => $data['title'],
+        //     //     'body' => $data['content'],
+        //     // ), function($message) use ($data){
+        //     //     $message->from('burcuhan@gmail.com', 'Fofik');
+        //     //     $message->to('jovanovic.nemanja.1029@gmail.com', 'Admin')->subject($data['title']);
+        //     // }); 
+        //     $details = array (
+        //         'subject' => $data['title'],
+        //         'body' => $data['content']
+        //     );
+        //     Mail::to('jovanovic.nemanja.1029@gmail.com')->send(new \App\Mail\FofikMail($details));
+        // }
+        $params = [];
+        $params['email_subject'] = $data['title'];
+        $params['email_body'] = $data['content'];
+        $params['include_email_tokens'] = $mails;
+        OneSignal::sendNotificationCustom($params);
     }
 }
