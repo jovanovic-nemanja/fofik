@@ -5,6 +5,17 @@
 
 @section('content')
 <div class="container">
+    <div class="row upload-csv">
+        <div class="">
+            <h2 id="introHeader">Upload your CSV File</h2>	
+            <fieldset>
+                <input type="file" name="File Upload" id="csv" accept=".csv" />
+            </fieldset> 
+        </div>
+        <div class="form-group pull-right">
+            <button class="btn btn-primary send-csv">Go</button>
+        </div>
+    </div>
     <div class="row">
         <div class="input-group spinner">
             <input type="text" class="form-control" value="5" readonly>
@@ -13,8 +24,6 @@
                 <button class="btn btn-default" type="button"><i class="fa fa-caret-down"></i></button>
             </div>
         </div>
-    </div>
-    <div class="row">  
         <div class="form-group name-box">
             <input type="text" class="form-control" placeholder="Enter celebrity name" name="names[]"/>
             <input type="text" class="form-control" placeholder="Enter celebrity name" name="names[]"/>
@@ -26,13 +35,19 @@
             <button class="btn btn-primary send">Go</button>
         </div>
     </div>
+    <div class="row">  
+        
+    </div>
 </div>
 @stop
 
 @push('scripts')
 <style>
-.name-box input {
-    margin: 10px 0px;
+.row {
+    margin: 15px;
+}
+.upload-csv {
+    border-bottom: 1px solid #c3c3c3;
 }
 .spinner {
   width: 100px;
@@ -113,6 +128,24 @@
             data: {
                 names: vals
             },
+            success: function (result) {
+                if (result.success) {
+                    alert("Successfully pushed");
+                } else {
+                    alert("Sorry, something went wrong");
+                }
+            }
+        })
+    })
+    $('.send-csv').click(function () {
+        var formData = new FormData();
+        formData.append('csv', $('#csv')[0].files[0]);
+        $.ajax({
+            url: 'document/names',
+            type: 'post',
+            data: formData,
+            contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+            processData: false, // NEEDED, DON'T OMIT THIS
             success: function (result) {
                 if (result.success) {
                     alert("Successfully pushed");
