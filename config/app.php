@@ -138,6 +138,7 @@ return [
         // App\Providers\ViewComposerServiceProvider::class,
         // App\Providers\DropboxServiceProvider::class,
         'Tymon\JWTAuth\Providers\LaravelServiceProvider',
+        Berkayk\OneSignal\OneSignalServiceProvider::class
 
     ],
 
@@ -191,5 +192,6 @@ return [
         'Notifty'    => Illuminate\Support\Facades\Notification::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class, 
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'OneSignal' => Berkayk\OneSignal\OneSignalFacade::class
     ],
 ];

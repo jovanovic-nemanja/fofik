@@ -17,6 +17,7 @@ class NotifyService extends BaseService
     
     public function pushNotify($data, $id = null)
     {
+        /*
         $now = date('Y-m-d H:i:s');
         if ($id)
             $firebaseToken = User::where(['id' => $id])->pluck('fb_token')->all();
@@ -52,6 +53,8 @@ class NotifyService extends BaseService
         curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
                
         $response = curl_exec($ch);
+        */
+        OneSignal::sendNotificationToAll($data['content'], null, null, null, null, $data['title']);
     }
     public function sendEmail($data, $id = null)
     {
@@ -67,7 +70,7 @@ class NotifyService extends BaseService
             // ), function($message) use ($data){
             //     $message->from('burcuhan@gmail.com', 'Fofik');
             //     $message->to('jovanovic.nemanja.1029@gmail.com', 'Admin')->subject($data['title']);
-            // });
+            // }); 
             $details = array (
                 'subject' => $data['title'],
                 'body' => $data['content']
