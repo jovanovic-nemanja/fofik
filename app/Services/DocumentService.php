@@ -17,7 +17,8 @@ class DocumentService extends BaseService
         $names = $params['names'];
         foreach ($names as $name)
         {
-            $this->store($name);
+            if ($name)
+                $this->store($name);
         }
     }
     public function store($name)
