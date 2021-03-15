@@ -78,7 +78,9 @@ class HistoryService extends BaseService
     {
         return DB::table('ff_search_histories')
                 ->where('user_id', $uid)
-                ->latest('created_on')
-                ->first();
+                ->orderBy('created_on', 'DESC')
+                ->offset(0)
+                ->take(5)
+                ->get();
     }
 }

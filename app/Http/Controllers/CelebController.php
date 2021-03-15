@@ -237,13 +237,12 @@ class CelebController extends Controller
     {
         $uid = auth('api')->user()->id;
         $user = $this->userService->getByID($uid);
-        $history = $this->historyService->getRecentSearchHistory($uid);
-
-        if (!$history)
-            return response()->json([
-                'success' => false
-            ]);
-        $data = $this->celebService->getBriefInfo($history->celeb_id, $user->lang);
+        $histories = $this->historyService->getRecentSearchHistory($uid);
+        $data = [];
+        foreach ($histories as $item)
+        {
+            $data[] = $this->celebService->getBriefInfo($item->celeb_id, $user->lang);
+        }
         return response()->json([
             'success' => true,
             'data' => $data
